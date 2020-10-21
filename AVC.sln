@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVCLib", "AVCLib\AVCLib.csproj", "{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoVolumeControl", "ArduinoVolumeControl\ArduinoVolumeControl.csproj", "{E89E3982-3982-42F3-BA08-82E042FC608D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E89E3982-3982-42F3-BA08-82E042FC608D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E89E3982-3982-42F3-BA08-82E042FC608D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E89E3982-3982-42F3-BA08-82E042FC608D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E89E3982-3982-42F3-BA08-82E042FC608D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
