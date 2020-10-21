@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVCLib", "AVCLib\AVCLib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoVolumeControl", "ArduinoVolumeControl\ArduinoVolumeControl.csproj", "{E89E3982-3982-42F3-BA08-82E042FC608D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleConsoleForTesting", "SimpleConsoleForTesting\SimpleConsoleForTesting.csproj", "{E55117B2-11F5-4ED8-BAA3-070A04404CBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreAudio", "CoreAudio\CoreAudio\CoreAudio.csproj", "{F295E413-624D-40D9-9E35-3EAFC8BFBE3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{E89E3982-3982-42F3-BA08-82E042FC608D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E89E3982-3982-42F3-BA08-82E042FC608D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E89E3982-3982-42F3-BA08-82E042FC608D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E55117B2-11F5-4ED8-BAA3-070A04404CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E55117B2-11F5-4ED8-BAA3-070A04404CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E55117B2-11F5-4ED8-BAA3-070A04404CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E55117B2-11F5-4ED8-BAA3-070A04404CBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F295E413-624D-40D9-9E35-3EAFC8BFBE3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F295E413-624D-40D9-9E35-3EAFC8BFBE3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F295E413-624D-40D9-9E35-3EAFC8BFBE3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F295E413-624D-40D9-9E35-3EAFC8BFBE3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
