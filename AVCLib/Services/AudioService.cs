@@ -6,13 +6,13 @@ namespace AVCLib.Services
 {
     public class AudioService
     {
-        MMDeviceEnumerator _deviceEnumerator = new MMDeviceEnumerator();
+        private readonly MMDeviceEnumerator _deviceEnumerator = new MMDeviceEnumerator();
 
         public AudioService()
         {
         }
 
-        public List<AudioDeviceModel> GetActiveDevices()
+        public List<AudioDeviceModel> GetActiveOutputDevices()
         {
             MMDeviceCollection endPoints = _deviceEnumerator.EnumerateAudioEndPoints(EDataFlow.eRender, DEVICE_STATE.DEVICE_STATE_ACTIVE);
             List<AudioDeviceModel> deviceModels = new List<AudioDeviceModel>();
@@ -23,15 +23,14 @@ namespace AVCLib.Services
                 {
                     Id = endPoint.ID,
                     FullName = endPoint.FriendlyName,
-                    Active = endPoint.Selected,
+                    Selected = endPoint.Selected,
                 });
             }
-
 
             return deviceModels;
         }
 
-        public AudioDeviceModel GetActiveDevice()
+        public AudioDeviceModel GetSelectedDevice()
         {
             MMDevice device = _deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
 
@@ -39,10 +38,17 @@ namespace AVCLib.Services
             {
                 Id = device.ID,
                 FullName = device.FriendlyName,
-                Active = device.Selected,
+                Selected = device.Selected,
+                Volume = device.AudioEndpointVolume.MasterVolumeLevelScalar,
+                Mute = device.AudioEndpointVolume.Mute
             };
         }
 
         public void SelectDeviceById(string id) => _deviceEnumerator.GetDevice(id).Selected = true;
+
+        public void SetVolume(string id, float value)
+        {
+            _deviceEnumerator.GetDevice(id).AudioEndpointVolume.MasterVolumeLevelScalar = value;
+        }
     }
 }

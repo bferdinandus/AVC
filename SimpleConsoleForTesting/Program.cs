@@ -11,7 +11,7 @@ namespace SimpleConsoleForTesting
         static void Main(string[] args)
         {
             AudioService audioService = new AudioService();
-            List<AudioDeviceModel> devices = audioService.GetActiveDevices();
+            List<AudioDeviceModel> devices = audioService.GetActiveOutputDevices();
 
             Console.Clear();
             Console.WriteLine("Press the number in front of the device to activate it. Press q to exit.");
@@ -24,7 +24,7 @@ namespace SimpleConsoleForTesting
 
                 for (int i = 0; i < devices.Count; i++)
                 {
-                    Console.WriteLine($"{i+1}. Device {devices[i].FullName}, active: {devices[i].Active}, ID: {devices[i].Id}");
+                    Console.WriteLine($"{i+1}. Device {devices[i].FullName}, active: {devices[i].Selected}, ID: {devices[i].Id}");
                 }
 
                 if (Console.KeyAvailable)
@@ -34,11 +34,11 @@ namespace SimpleConsoleForTesting
                     {
                         case ConsoleKey.D1:
                             audioService.SelectDeviceById(devices[0].Id);
-                            devices = audioService.GetActiveDevices();
+                            devices = audioService.GetActiveOutputDevices();
                             break;
                         case ConsoleKey.D2:
                             audioService.SelectDeviceById(devices[1].Id);
-                            devices = audioService.GetActiveDevices();
+                            devices = audioService.GetActiveOutputDevices ();
                             break;
                         case ConsoleKey.Q:
                             Console.CursorVisible = true;

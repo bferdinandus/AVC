@@ -4,9 +4,9 @@
     {
         public string Id { get; set; }
         public string FullName { get; set; }
-        public bool Active { get; set; }
+        public bool Selected { get; set; }
         public bool Mute { get; set; }
-        public int Volume { get; set; }
+        public float Volume { get; set; }
 
     }
 }

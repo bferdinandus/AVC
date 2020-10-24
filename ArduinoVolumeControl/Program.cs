@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using AVCLib.Services;
 
 namespace ArduinoVolumeControl
 {
@@ -14,7 +15,7 @@ namespace ArduinoVolumeControl
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ArduinoVolumeControl());
+            Application.Run(new ArduinoVolumeControl(new AudioService()));
         }
     }
 }
