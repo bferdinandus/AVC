@@ -9,7 +9,7 @@ namespace ArduinoVolumeControl
     public partial class ArduinoVolumeControl : Form
     {
         private readonly AudioService _audioService;
-
+        private readonly bool _initialized;
         private BindingList<AudioDeviceModel> OutputDevices { get; } = new BindingList<AudioDeviceModel>();
 
         public ArduinoVolumeControl(AudioService audioService)
@@ -22,6 +22,8 @@ namespace ArduinoVolumeControl
             SwitchOutputDropDown.DisplayMember = "FullName";
 
             UpdateOutputDevices();
+
+            _initialized = true;
         }
 
         private void UpdateOutputDevices()
@@ -35,9 +37,10 @@ namespace ArduinoVolumeControl
 
                 if (outputDevice.Selected)
                 {
-                    selectedDeviceIndex = OutputDevices.Count-1;
+                    selectedDeviceIndex = OutputDevices.Count - 1;
                 }
             }
+
             SwitchOutputDropDown.SelectedIndex = selectedDeviceIndex;
         }
 
@@ -45,20 +48,31 @@ namespace ArduinoVolumeControl
         {
             AudioDeviceModel selectedDevice = (AudioDeviceModel) SwitchOutputDropDown.SelectedItem;
 
-            _audioService.SelectDeviceById(selectedDevice.Id);
-            UpdateSwitchOutputVolumeSlider();
+            if (_initialized)
+            {
+                // activate the system output device only after the initialisation
+                _audioService.SelectDeviceById(selectedDevice.Id);
+            }
+
+            // attach slider update function to the device update volume event
+            _audioService.AttachFormUpdateFunction(selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
+
+            UpdateSwitchOutputVolumeSlider(selectedDevice.Id);
         }
 
-        private void UpdateSwitchOutputVolumeSlider()
+        private void UpdateSwitchOutputVolumeSlider(string selectedDeviceId)
         {
-            AudioDeviceModel device = _audioService.GetSelectedDevice();
-            SwitchOutputVolumeSlider.Value = (int)(device.Volume * 100);
+            if (SwitchOutputVolumeSlider.InvokeRequired)
+            {
+                SwitchOutputVolumeSlider.Invoke((MethodInvoker)delegate { UpdateSwitchOutputVolumeSlider(selectedDeviceId); });
+
+                return;
+            }
+
+            SwitchOutputVolumeSlider.Value = _audioService.GetVolume(selectedDeviceId);
         }
 
-        private void SwitchOutputVolumeSlider_Scroll(object sender, EventArgs e)
-        {
-            AudioDeviceModel device = _audioService.GetSelectedDevice();
-            _audioService.SetVolume(device.Id, SwitchOutputVolumeSlider.Value / 100f);
-        }
+        private void SwitchOutputVolumeSlider_Scroll(object sender, EventArgs e) =>
+            _audioService.SetVolume(((AudioDeviceModel) SwitchOutputDropDown.SelectedItem).Id, SwitchOutputVolumeSlider.Value);
     }
 }

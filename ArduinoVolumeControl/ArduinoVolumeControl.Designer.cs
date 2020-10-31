@@ -43,6 +43,7 @@ namespace ArduinoVolumeControl
             this.SwitchOutputLabel = new System.Windows.Forms.Label();
             this.SwitchOutputVolumeSlider = new System.Windows.Forms.TrackBar();
             this.SwitchOutputDropDown = new System.Windows.Forms.ComboBox();
+            this.FeedbackLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider3)).BeginInit();
@@ -62,11 +63,14 @@ namespace ArduinoVolumeControl
             // AudioSessionVolumeSlider1
             // 
             this.AudioSessionVolumeSlider1.Cursor = System.Windows.Forms.Cursors.SizeWE;
-            this.AudioSessionVolumeSlider1.LargeChange = 2;
+            this.AudioSessionVolumeSlider1.LargeChange = 20;
             this.AudioSessionVolumeSlider1.Location = new System.Drawing.Point(339, 55);
+            this.AudioSessionVolumeSlider1.Maximum = 100;
             this.AudioSessionVolumeSlider1.Name = "AudioSessionVolumeSlider1";
             this.AudioSessionVolumeSlider1.Size = new System.Drawing.Size(381, 45);
+            this.AudioSessionVolumeSlider1.SmallChange = 5;
             this.AudioSessionVolumeSlider1.TabIndex = 4;
+            this.AudioSessionVolumeSlider1.TickFrequency = 5;
             this.AudioSessionVolumeSlider1.TickStyle = System.Windows.Forms.TickStyle.Both;
             // 
             // AudioSessionDropDown1
@@ -91,11 +95,15 @@ namespace ArduinoVolumeControl
             // AudioSessionVolumeSlider2
             // 
             this.AudioSessionVolumeSlider2.Cursor = System.Windows.Forms.Cursors.SizeWE;
-            this.AudioSessionVolumeSlider2.LargeChange = 2;
+            this.AudioSessionVolumeSlider2.LargeChange = 20;
             this.AudioSessionVolumeSlider2.Location = new System.Drawing.Point(339, 106);
+            this.AudioSessionVolumeSlider2.Maximum = 100;
             this.AudioSessionVolumeSlider2.Name = "AudioSessionVolumeSlider2";
+            this.AudioSessionVolumeSlider2.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.AudioSessionVolumeSlider2.Size = new System.Drawing.Size(381, 45);
+            this.AudioSessionVolumeSlider2.SmallChange = 5;
             this.AudioSessionVolumeSlider2.TabIndex = 6;
+            this.AudioSessionVolumeSlider2.TickFrequency = 5;
             this.AudioSessionVolumeSlider2.TickStyle = System.Windows.Forms.TickStyle.Both;
             // 
             // AudioSessionDropDown2
@@ -110,11 +118,14 @@ namespace ArduinoVolumeControl
             // AudioSessionVolumeSlider3
             // 
             this.AudioSessionVolumeSlider3.Cursor = System.Windows.Forms.Cursors.SizeWE;
-            this.AudioSessionVolumeSlider3.LargeChange = 2;
+            this.AudioSessionVolumeSlider3.LargeChange = 20;
             this.AudioSessionVolumeSlider3.Location = new System.Drawing.Point(339, 157);
+            this.AudioSessionVolumeSlider3.Maximum = 100;
             this.AudioSessionVolumeSlider3.Name = "AudioSessionVolumeSlider3";
             this.AudioSessionVolumeSlider3.Size = new System.Drawing.Size(381, 45);
+            this.AudioSessionVolumeSlider3.SmallChange = 5;
             this.AudioSessionVolumeSlider3.TabIndex = 8;
+            this.AudioSessionVolumeSlider3.TickFrequency = 5;
             this.AudioSessionVolumeSlider3.TickStyle = System.Windows.Forms.TickStyle.Both;
             // 
             // AudioSessionDropDown3
@@ -156,6 +167,7 @@ namespace ArduinoVolumeControl
             this.SwitchOutputVolumeSlider.Size = new System.Drawing.Size(381, 45);
             this.SwitchOutputVolumeSlider.SmallChange = 5;
             this.SwitchOutputVolumeSlider.TabIndex = 12;
+            this.SwitchOutputVolumeSlider.TickFrequency = 5;
             this.SwitchOutputVolumeSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.SwitchOutputVolumeSlider.Scroll += new System.EventHandler(this.SwitchOutputVolumeSlider_Scroll);
             // 
@@ -169,12 +181,23 @@ namespace ArduinoVolumeControl
             this.SwitchOutputDropDown.TabIndex = 11;
             this.SwitchOutputDropDown.SelectedIndexChanged += new System.EventHandler(this.SwitchOutputDropDown_SelectedIndexChanged);
             // 
+            // FeedbackLabel
+            // 
+            this.FeedbackLabel.AutoSize = true;
+            this.FeedbackLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
+            this.FeedbackLabel.Location = new System.Drawing.Point(66, 352);
+            this.FeedbackLabel.Name = "FeedbackLabel";
+            this.FeedbackLabel.Size = new System.Drawing.Size(52, 21);
+            this.FeedbackLabel.TabIndex = 13;
+            this.FeedbackLabel.Text = "label1";
+            // 
             // ArduinoVolumeControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(818, 420);
+            this.Controls.Add(this.FeedbackLabel);
             this.Controls.Add(this.AudioSessionDropDown3);
             this.Controls.Add(this.AudioSessionDropDown2);
             this.Controls.Add(this.AudioSessionVolumeSlider3);
@@ -198,6 +221,8 @@ namespace ArduinoVolumeControl
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.Label FeedbackLabel;
 
         private System.Windows.Forms.ComboBox AudioSessionDropDown1;
         private System.Windows.Forms.ComboBox AudioSessionDropDown2;
