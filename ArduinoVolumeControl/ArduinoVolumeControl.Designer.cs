@@ -49,9 +49,9 @@ namespace ArduinoVolumeControl
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.SwitchOutputVolumeSlider)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // AurdioSessionVolumeLabel
-            // 
+            //
             this.AurdioSessionVolumeLabel.Location = new System.Drawing.Point(339, 22);
             this.AurdioSessionVolumeLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.AurdioSessionVolumeLabel.Name = "AurdioSessionVolumeLabel";
@@ -59,9 +59,9 @@ namespace ArduinoVolumeControl
             this.AurdioSessionVolumeLabel.TabIndex = 2;
             this.AurdioSessionVolumeLabel.Text = "Volume";
             this.AurdioSessionVolumeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
+            //
             // AudioSessionVolumeSlider1
-            // 
+            //
             this.AudioSessionVolumeSlider1.Cursor = System.Windows.Forms.Cursors.SizeWE;
             this.AudioSessionVolumeSlider1.LargeChange = 20;
             this.AudioSessionVolumeSlider1.Location = new System.Drawing.Point(339, 55);
@@ -72,9 +72,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionVolumeSlider1.TabIndex = 4;
             this.AudioSessionVolumeSlider1.TickFrequency = 5;
             this.AudioSessionVolumeSlider1.TickStyle = System.Windows.Forms.TickStyle.Both;
-            // 
+            //
             // AudioSessionDropDown1
-            // 
+            //
             this.AudioSessionDropDown1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AudioSessionDropDown1.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.AudioSessionDropDown1.FormattingEnabled = true;
@@ -82,9 +82,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionDropDown1.Name = "AudioSessionDropDown1";
             this.AudioSessionDropDown1.Size = new System.Drawing.Size(267, 28);
             this.AudioSessionDropDown1.TabIndex = 3;
-            // 
+            //
             // AudioSessionLabel
-            // 
+            //
             this.AudioSessionLabel.Location = new System.Drawing.Point(66, 22);
             this.AudioSessionLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.AudioSessionLabel.Name = "AudioSessionLabel";
@@ -92,9 +92,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionLabel.TabIndex = 1;
             this.AudioSessionLabel.Text = "Audio Session";
             this.AudioSessionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
+            //
             // AudioSessionVolumeSlider2
-            // 
+            //
             this.AudioSessionVolumeSlider2.Cursor = System.Windows.Forms.Cursors.SizeWE;
             this.AudioSessionVolumeSlider2.LargeChange = 20;
             this.AudioSessionVolumeSlider2.Location = new System.Drawing.Point(339, 106);
@@ -106,9 +106,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionVolumeSlider2.TabIndex = 6;
             this.AudioSessionVolumeSlider2.TickFrequency = 5;
             this.AudioSessionVolumeSlider2.TickStyle = System.Windows.Forms.TickStyle.Both;
-            // 
+            //
             // AudioSessionDropDown2
-            // 
+            //
             this.AudioSessionDropDown2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AudioSessionDropDown2.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.AudioSessionDropDown2.FormattingEnabled = true;
@@ -116,9 +116,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionDropDown2.Name = "AudioSessionDropDown2";
             this.AudioSessionDropDown2.Size = new System.Drawing.Size(267, 28);
             this.AudioSessionDropDown2.TabIndex = 5;
-            // 
+            //
             // AudioSessionVolumeSlider3
-            // 
+            //
             this.AudioSessionVolumeSlider3.Cursor = System.Windows.Forms.Cursors.SizeWE;
             this.AudioSessionVolumeSlider3.LargeChange = 20;
             this.AudioSessionVolumeSlider3.Location = new System.Drawing.Point(339, 157);
@@ -129,9 +129,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionVolumeSlider3.TabIndex = 8;
             this.AudioSessionVolumeSlider3.TickFrequency = 5;
             this.AudioSessionVolumeSlider3.TickStyle = System.Windows.Forms.TickStyle.Both;
-            // 
+            //
             // AudioSessionDropDown3
-            // 
+            //
             this.AudioSessionDropDown3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AudioSessionDropDown3.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.AudioSessionDropDown3.FormattingEnabled = true;
@@ -139,9 +139,9 @@ namespace ArduinoVolumeControl
             this.AudioSessionDropDown3.Name = "AudioSessionDropDown3";
             this.AudioSessionDropDown3.Size = new System.Drawing.Size(267, 28);
             this.AudioSessionDropDown3.TabIndex = 7;
-            // 
+            //
             // SwitchOutputVolumeLabel
-            // 
+            //
             this.SwitchOutputVolumeLabel.Location = new System.Drawing.Point(339, 253);
             this.SwitchOutputVolumeLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.SwitchOutputVolumeLabel.Name = "SwitchOutputVolumeLabel";
@@ -149,9 +149,9 @@ namespace ArduinoVolumeControl
             this.SwitchOutputVolumeLabel.TabIndex = 10;
             this.SwitchOutputVolumeLabel.Text = "Volume";
             this.SwitchOutputVolumeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
+            //
             // SwitchOutputLabel
-            // 
+            //
             this.SwitchOutputLabel.Location = new System.Drawing.Point(66, 253);
             this.SwitchOutputLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.SwitchOutputLabel.Name = "SwitchOutputLabel";
@@ -159,9 +159,9 @@ namespace ArduinoVolumeControl
             this.SwitchOutputLabel.TabIndex = 9;
             this.SwitchOutputLabel.Text = "Switch Output";
             this.SwitchOutputLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
+            //
             // SwitchOutputVolumeSlider
-            // 
+            //
             this.SwitchOutputVolumeSlider.Cursor = System.Windows.Forms.Cursors.SizeWE;
             this.SwitchOutputVolumeSlider.LargeChange = 20;
             this.SwitchOutputVolumeSlider.Location = new System.Drawing.Point(339, 286);
@@ -173,9 +173,9 @@ namespace ArduinoVolumeControl
             this.SwitchOutputVolumeSlider.TickFrequency = 5;
             this.SwitchOutputVolumeSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.SwitchOutputVolumeSlider.Scroll += new System.EventHandler(this.SwitchOutputVolumeSlider_Scroll);
-            // 
+            //
             // SwitchOutputDropDown
-            // 
+            //
             this.SwitchOutputDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SwitchOutputDropDown.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.SwitchOutputDropDown.FormattingEnabled = true;
@@ -184,18 +184,18 @@ namespace ArduinoVolumeControl
             this.SwitchOutputDropDown.Size = new System.Drawing.Size(267, 28);
             this.SwitchOutputDropDown.TabIndex = 11;
             this.SwitchOutputDropDown.SelectedIndexChanged += new System.EventHandler(this.SwitchOutputDropDown_SelectedIndexChanged);
-            // 
+            //
             // TestLabel
-            // 
+            //
             this.TestLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.TestLabel.Location = new System.Drawing.Point(155, 364);
             this.TestLabel.Name = "TestLabel";
             this.TestLabel.Size = new System.Drawing.Size(100, 23);
             this.TestLabel.TabIndex = 13;
             this.TestLabel.Text = "Test Label";
-            // 
+            //
             // ArduinoVolumeControl
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;

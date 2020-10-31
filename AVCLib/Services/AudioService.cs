@@ -63,14 +63,14 @@ namespace AVCLib.Services
             return _deviceModels.Single(m => m.Id == id).Volume;
         }
 
-        public void AttachFormUpdateFunction(string id, Action<string> callbackFunction)
+        public void AttachOutputDeviceVolumeChanged(string id, Action<string> callbackFunction)
         {
-            _deviceModels.Single(m => m.Id == id).OutputDeviceVolumeChanged += callbackFunction;
+            _deviceModels.Single(m => m.Id == id).OnOutputDeviceVolumeChanged += callbackFunction;
         }
 
-        public void DettachFormUpdateFunction(string id, Action<string> callbackFunction)
+        public void DetachOutputDeviceVolumeChanged(string id, Action<string> callbackFunction)
         {
-            _deviceModels.Single(m => m.Id == id).OutputDeviceVolumeChanged -= callbackFunction;
+            _deviceModels.Single(m => m.Id == id).OnOutputDeviceVolumeChanged -= callbackFunction;
         }
     }
 }

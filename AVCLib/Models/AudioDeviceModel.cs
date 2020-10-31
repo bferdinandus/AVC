@@ -10,14 +10,17 @@ namespace AVCLib.Models
         public bool Selected { get; set; }
         public bool Muted { get; set; }
         public int Volume { get; set; }
-        public event Action<string> OutputDeviceVolumeChanged;
+        public event Action<string> OnOutputDeviceVolumeChanged;
 
         public void UpdateVolume(AudioVolumeNotificationData data)
         {
             Volume = (int) (data.MasterVolume * 100);
             Muted = data.Muted;
 
-            if (Selected) OutputDeviceVolumeChanged?.Invoke(Id);
+            if (Selected)
+            {
+                OnOutputDeviceVolumeChanged?.Invoke(Id);
+            }
         }
     }
 }
