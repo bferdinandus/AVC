@@ -10,7 +10,6 @@ namespace ArduinoVolumeControl
     {
         private readonly AudioService _audioService;
         private readonly bool _initialized;
-        private BindingList<AudioDeviceModel> OutputDevices { get; } = new BindingList<AudioDeviceModel>();
 
         public ArduinoVolumeControl(AudioService audioService)
         {
@@ -25,6 +24,8 @@ namespace ArduinoVolumeControl
 
             _initialized = true;
         }
+
+        private BindingList<AudioDeviceModel> OutputDevices { get; } = new BindingList<AudioDeviceModel>();
 
         private void UpdateOutputDevices()
         {
@@ -75,7 +76,9 @@ namespace ArduinoVolumeControl
             }
         }
 
-        private void SwitchOutputVolumeSlider_Scroll(object sender, EventArgs e) =>
+        private void SwitchOutputVolumeSlider_Scroll(object sender, EventArgs e)
+        {
             _audioService.SetVolume(((AudioDeviceModel) SwitchOutputDropDown.SelectedItem).Id, SwitchOutputVolumeSlider.Value);
+        }
     }
 }

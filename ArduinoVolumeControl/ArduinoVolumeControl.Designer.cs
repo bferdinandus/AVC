@@ -43,6 +43,7 @@ namespace ArduinoVolumeControl
             this.SwitchOutputLabel = new System.Windows.Forms.Label();
             this.SwitchOutputVolumeSlider = new System.Windows.Forms.TrackBar();
             this.SwitchOutputDropDown = new System.Windows.Forms.ComboBox();
+            this.TestLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider3)).BeginInit();
@@ -184,12 +185,22 @@ namespace ArduinoVolumeControl
             this.SwitchOutputDropDown.TabIndex = 11;
             this.SwitchOutputDropDown.SelectedIndexChanged += new System.EventHandler(this.SwitchOutputDropDown_SelectedIndexChanged);
             // 
+            // TestLabel
+            // 
+            this.TestLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
+            this.TestLabel.Location = new System.Drawing.Point(155, 364);
+            this.TestLabel.Name = "TestLabel";
+            this.TestLabel.Size = new System.Drawing.Size(100, 23);
+            this.TestLabel.TabIndex = 13;
+            this.TestLabel.Text = "Test Label";
+            // 
             // ArduinoVolumeControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(818, 420);
+            this.Controls.Add(this.TestLabel);
             this.Controls.Add(this.AudioSessionDropDown3);
             this.Controls.Add(this.AudioSessionDropDown2);
             this.Controls.Add(this.AudioSessionVolumeSlider3);
@@ -213,6 +224,8 @@ namespace ArduinoVolumeControl
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.Label TestLabel;
 
         private System.Windows.Forms.ComboBox AudioSessionDropDown1;
         private System.Windows.Forms.ComboBox AudioSessionDropDown2;
