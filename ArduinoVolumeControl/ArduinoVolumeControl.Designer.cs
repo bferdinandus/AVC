@@ -31,6 +31,8 @@ namespace ArduinoVolumeControl
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArduinoVolumeControl));
             this.AurdioSessionVolumeLabel = new System.Windows.Forms.Label();
             this.AudioSessionVolumeSlider1 = new System.Windows.Forms.TrackBar();
             this.AudioSessionDropDown1 = new System.Windows.Forms.ComboBox();
@@ -44,10 +46,14 @@ namespace ArduinoVolumeControl
             this.SwitchOutputVolumeSlider = new System.Windows.Forms.TrackBar();
             this.SwitchOutputDropDown = new System.Windows.Forms.ComboBox();
             this.TestLabel = new System.Windows.Forms.Label();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.SwitchOutputVolumeSlider)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             //
             // AurdioSessionVolumeLabel
@@ -194,6 +200,27 @@ namespace ArduinoVolumeControl
             this.TestLabel.TabIndex = 13;
             this.TestLabel.Text = "Test Label";
             //
+            // notifyIcon1
+            //
+            this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
+            this.notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+            //
+            // contextMenuStrip1
+            //
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {this.exitToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(94, 26);
+            //
+            // exitToolStripMenuItem
+            //
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            //
             // ArduinoVolumeControl
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
@@ -217,13 +244,21 @@ namespace ArduinoVolumeControl
             this.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
             this.Name = "ArduinoVolumeControl";
             this.Text = "Arduino Volume Control";
+            this.Resize += new System.EventHandler(this.ArduinoVolumeControl_Resize);
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider2)).EndInit();
             ((System.ComponentModel.ISupportInitialize) (this.AudioSessionVolumeSlider3)).EndInit();
             ((System.ComponentModel.ISupportInitialize) (this.SwitchOutputVolumeSlider)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+
+
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
 
         private System.Windows.Forms.Label TestLabel;
 

@@ -103,5 +103,30 @@ namespace ArduinoVolumeControl
         {
             _audioService.SetVolume(_selectedDevice.Id, SwitchOutputVolumeSlider.Value);
         }
+
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            //notifyIcon1.Visible = false;
+        }
+
+        private void ArduinoVolumeControl_Resize(object sender, EventArgs e)
+        {
+            //if the form is minimized
+            //hide it from the task bar
+            //and show the system tray icon (represented by the NotifyIcon control)
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+                //notifyIcon1.Visible = true;
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
