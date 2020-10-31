@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AVCLib.Models;
 using CoreAudio;
@@ -21,7 +22,7 @@ namespace AVCLib.Services
                     Id = endPoint.ID,
                     FullName = endPoint.FriendlyName,
                     Selected = endPoint.Selected,
-                    Volume = (int) endPoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100,
+                    Volume = (int) (endPoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100),
                     Muted = endPoint.AudioEndpointVolume.Mute
                 };
                 endPoint.AudioEndpointVolume.OnVolumeNotification += device.UpdateVolume;
@@ -62,12 +63,12 @@ namespace AVCLib.Services
             return _deviceModels.Single(m => m.Id == id).Volume;
         }
 
-        public void AttachFormUpdateFunction(string id, Delegates.DeviceChanged callbackFunction)
+        public void AttachFormUpdateFunction(string id, Action<string> callbackFunction)
         {
             _deviceModels.Single(m => m.Id == id).OutputDeviceVolumeChanged += callbackFunction;
         }
 
-        public void DettachFormUpdateFunction(string id, Delegates.DeviceChanged callbackFunction)
+        public void DettachFormUpdateFunction(string id, Action<string> callbackFunction)
         {
             _deviceModels.Single(m => m.Id == id).OutputDeviceVolumeChanged -= callbackFunction;
         }

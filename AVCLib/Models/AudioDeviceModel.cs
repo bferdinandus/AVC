@@ -1,10 +1,11 @@
-﻿using CoreAudio;
+﻿using System;
+using CoreAudio;
 
 namespace AVCLib.Models
 {
     public class AudioDeviceModel
     {
-        public event Delegates.DeviceChanged OutputDeviceVolumeChanged;
+        public event Action<string> OutputDeviceVolumeChanged;
 
         public string Id { get; set; }
         public string FullName { get; set; }

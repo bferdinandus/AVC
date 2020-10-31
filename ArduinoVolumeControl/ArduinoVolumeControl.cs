@@ -38,6 +38,10 @@ namespace ArduinoVolumeControl
                 if (outputDevice.Selected)
                 {
                     selectedDeviceIndex = OutputDevices.Count - 1;
+
+                    // attach slider update function to the device update volume event
+                    _audioService.AttachFormUpdateFunction(outputDevice.Id, UpdateSwitchOutputVolumeSlider);
+                    UpdateSwitchOutputVolumeSlider(outputDevice.Id);
                 }
             }
 
@@ -56,7 +60,6 @@ namespace ArduinoVolumeControl
 
             // attach slider update function to the device update volume event
             _audioService.AttachFormUpdateFunction(selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
-
             UpdateSwitchOutputVolumeSlider(selectedDevice.Id);
         }
 
@@ -64,12 +67,12 @@ namespace ArduinoVolumeControl
         {
             if (SwitchOutputVolumeSlider.InvokeRequired)
             {
-                SwitchOutputVolumeSlider.Invoke((MethodInvoker)delegate { UpdateSwitchOutputVolumeSlider(selectedDeviceId); });
-
-                return;
+                SwitchOutputVolumeSlider.Invoke((MethodInvoker) (() => UpdateSwitchOutputVolumeSlider(selectedDeviceId)));
             }
-
-            SwitchOutputVolumeSlider.Value = _audioService.GetVolume(selectedDeviceId);
+            else
+            {
+                SwitchOutputVolumeSlider.Value = _audioService.GetVolume(selectedDeviceId);
+            }
         }
 
         private void SwitchOutputVolumeSlider_Scroll(object sender, EventArgs e) =>
