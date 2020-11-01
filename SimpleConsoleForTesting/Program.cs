@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using AVCLib.Models;
-using AVCLib.Services;
+using CoreAudio;
 
 namespace SimpleConsoleForTesting
 {
@@ -10,43 +7,15 @@ namespace SimpleConsoleForTesting
     {
         static void Main(string[] args)
         {
-            AudioService audioService = new AudioService();
-            List<AudioDeviceModel> devices = audioService.GetActiveOutputDevices();
-
-            Console.Clear();
-            Console.WriteLine("Press the number in front of the device to activate it. Press q to exit.");
-
-
-            Console.CursorVisible = false;
-            while (true)
+            MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
+            MMDevice device = deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+            SessionCollection sessions = device.AudioSessionManager2.Sessions;
+            foreach (AudioSessionControl2 session in sessions)
             {
-                Console.SetCursorPosition(0, 1);
-
-                for (int i = 0; i < devices.Count; i++)
-                {
-                    Console.WriteLine($"{i+1}. Device {devices[i].FullName}, active: {devices[i].Selected}, ID: {devices[i].Id}");
-                }
-
-                if (Console.KeyAvailable)
-                {
-                    ConsoleKeyInfo key = Console.ReadKey(true);
-                    switch (key.Key)
-                    {
-                        case ConsoleKey.D1:
-                            audioService.SelectDeviceById(devices[0].Id);
-                            devices = audioService.GetActiveOutputDevices();
-                            break;
-                        case ConsoleKey.D2:
-                            audioService.SelectDeviceById(devices[1].Id);
-                            devices = audioService.GetActiveOutputDevices ();
-                            break;
-                        case ConsoleKey.Q:
-                            Console.CursorVisible = true;
-                            return;
-                    }
-                }
-
-                Thread.Sleep(10);
+                Console.WriteLine($"Session Identifier: {session.GetSessionIdentifier}");
+                Console.WriteLine($"Session Name: {session.DisplayName}");
+                Console.WriteLine($"Session IconPath: {session.IconPath}");
+                Console.WriteLine("===================");
             }
         }
     }

@@ -15,7 +15,10 @@ namespace ArduinoVolumeControl
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ArduinoVolumeControl(new AudioService()));
+
+            AudioService audioService = new AudioService();
+
+            Application.Run(new ArduinoVolumeControl(audioService));
         }
     }
 }
