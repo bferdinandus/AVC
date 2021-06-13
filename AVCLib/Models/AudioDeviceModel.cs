@@ -1,26 +1,26 @@
 ﻿using System;
-using CoreAudio;
 
 namespace AVCLib.Models
 {
     public class AudioDeviceModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string FullName { get; set; }
         public bool Selected { get; set; }
         public bool Muted { get; set; }
         public int Volume { get; set; }
-        public event Action<string> OnOutputDeviceVolumeChanged;
+        public event Action<Guid> OnOutputDeviceVolumeChanged;
 
-        public void UpdateVolume(AudioVolumeNotificationData data)
+        public bool UpdateVolume(double volume)
         {
-            Volume = (int) (data.MasterVolume * 100);
-            Muted = data.Muted;
+            Volume = (int) volume;
 
             if (Selected)
             {
                 OnOutputDeviceVolumeChanged?.Invoke(Id);
             }
+
+            return true;
         }
     }
 }

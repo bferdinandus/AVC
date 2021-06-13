@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AVCLib\AVCLib.csproj" />
+      <ProjectReference Include="..\AudioSwitcher-master\AudioSwitcher.AudioApi.CoreAudio\AudioSwitcher.AudioApi.CoreAudio.csproj" />
     </ItemGroup>
+
+
 
 </Project>

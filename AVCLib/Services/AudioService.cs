@@ -1,34 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AudioSwitcher.AudioApi;
+using AudioSwitcher.AudioApi.CoreAudio;
+using AudioSwitcher.AudioApi.Observables;
+using AudioSwitcher.AudioApi.Session;
 using AVCLib.Models;
-using CoreAudio;
 
 namespace AVCLib.Services
 {
     public class AudioService
     {
-        private readonly MMDeviceEnumerator _deviceEnumerator = new MMDeviceEnumerator();
-        private readonly List<AudioDeviceModel> _outputDevices = new List<AudioDeviceModel>();
-        private readonly List<AudioSessionModel> _audioSessions = new List<AudioSessionModel>();
 
+        private readonly List<AudioDeviceModel> _outputDevices = new();
+        private readonly List<AudioSessionModel> _audioSessions = new();
+        private readonly CoreAudioController _audioController;
+
+        public AudioService()
+        {
+            _audioController = new CoreAudioController();
+
+
+
+        }
         public List<AudioDeviceModel> GetActiveOutputDevices()
         {
-            MMDeviceCollection endPoints = _deviceEnumerator.EnumerateAudioEndPoints(EDataFlow.eRender, DEVICE_STATE.DEVICE_STATE_ACTIVE);
+            IEnumerable<CoreAudioDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
 
-            foreach (MMDevice endPoint in endPoints)
+            foreach (CoreAudioDevice device in devices)
             {
-                AudioDeviceModel device = new AudioDeviceModel
+                AudioDeviceModel deviceModel = new()
                 {
-                    Id = endPoint.ID,
-                    FullName = endPoint.FriendlyName,
-                    Selected = endPoint.Selected,
-                    Volume = (int) (endPoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100),
-                    Muted = endPoint.AudioEndpointVolume.Mute
+                    Id = device.Id,
+                    FullName = device.Name,
+                    Selected = device.IsDefaultDevice,
+                    Volume = (int) device.Volume,
+                    Muted = device.IsMuted
                 };
-                endPoint.AudioEndpointVolume.OnVolumeNotification += device.UpdateVolume;
 
-                _outputDevices.Add(device);
+                device.VolumeChanged.When(c => deviceModel.UpdateVolume(c.Volume));
+
+                _outputDevices.Add(deviceModel);
             }
 
             return _outputDevices;
@@ -36,31 +48,29 @@ namespace AVCLib.Services
 
         public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
         {
-            MMDevice device = _deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+            CoreAudioDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
+            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
 
-            SessionCollection sessions = device.AudioSessionManager2.Sessions;
-
-            foreach (AudioSessionControl2 session in sessions)
+            foreach (IAudioSession session in sessions)
             {
-                Console.WriteLine($"Session Identifier: {session.GetSessionIdentifier}");
+                Console.WriteLine($"Session Identifier: {session.Id}");
                 Console.WriteLine($"Session Name: {session.DisplayName}");
                 Console.WriteLine($"Session IconPath: {session.IconPath}");
-                SimpleAudioVolume vol = session.SimpleAudioVolume;
-                AudioSessionModel audioSession = new AudioSessionModel
+
+                AudioSessionModel audioSession = new()
                 {
+                    Id = session.Id,
                     DisplayName = session.DisplayName,
-                    State = session.State,
                     IconPath = session.IconPath,
-                    SessionIdentifier = session.GetSessionIdentifier,
-                    SessionInstanceIdentifier = session.GetSessionInstanceIdentifier,
-                    ProcessID = session.GetProcessID,
-                    IsSystemSoundsSession = session.IsSystemSoundsSession,
-                    Volume = (int) (vol.MasterVolume * 100),
-                    Muted = vol.Mute
+                    State = session.SessionState,
+                    ProcessId = session.ProcessId,
+                    IsSystemSoundsSession = session.IsSystemSession,
+                    Volume = (int) session.Volume,
+                    Muted = session.IsMuted
                 };
-                session.OnChannelVolumeChanged += audioSession.ChannelVolumeChanged;
-                session.OnSimpleVolumeChanged += audioSession.SimpleVolumeChanged;
-                session.OnStateChanged += audioSession.StateChanged;
+                // session.OnChannelVolumeChanged += audioSession.ChannelVolumeChanged;
+                // session.OnSimpleVolumeChanged += audioSession.SimpleVolumeChanged;
+                // session.OnStateChanged += audioSession.StateChanged;
 
                 _audioSessions.Add(audioSession);
             }
@@ -68,6 +78,7 @@ namespace AVCLib.Services
             return _audioSessions;
         }
 
+        /*
         public AudioDeviceModel GetSelectedDevice()
         {
             MMDevice device = _deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
@@ -76,39 +87,39 @@ namespace AVCLib.Services
 
             return model;
         }
+        */
 
-        public void SelectDeviceById(string id)
+        public void SelectDeviceById(Guid id)
         {
-            // mark al local models as not selected
+            // mark all local models as not selected
             _outputDevices.ForEach(m => m.Selected = false);
             // mark requested model as selected
             _outputDevices.Single(m => m.Id == id).Selected = true;
             // select the output device
-            _deviceEnumerator.GetDevice(id).Selected = true;
+            _audioController.GetDevice(id).SetAsDefault();
         }
 
-        public void SetVolume(string id, int value)
+        public void SetVolume(Guid id, int value)
         {
-            //_deviceModels.Single(m => m.Id == id).Selected = true;
-            _deviceEnumerator.GetDevice(id).AudioEndpointVolume.MasterVolumeLevelScalar = value / 100F;
+            _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
-        public int GetDeviceVolume(string id)
+        public int GetDeviceVolume(Guid id)
         {
             return _outputDevices.Single(m => m.Id == id).Volume;
         }
 
-        public int GetAudioSessionVolume(string id)
-        {
-            return _audioSessions.Single(m => m.SessionIdentifier == id).Volume;
-        }
+        // public int GetAudioSessionVolume(string id)
+        // {
+        //     return _audioSessions.Single(m => m.SessionIdentifier == id).Volume;
+        // }
 
-        public void AttachOutputDeviceVolumeChanged(string id, Action<string> callbackFunction)
+        public void AttachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
         {
             _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged += callbackFunction;
         }
 
-        public void DetachOutputDeviceVolumeChanged(string id, Action<string> callbackFunction)
+        public void DetachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
         {
             _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged -= callbackFunction;
         }

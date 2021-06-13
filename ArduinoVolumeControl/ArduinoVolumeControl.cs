@@ -42,10 +42,10 @@ namespace ArduinoVolumeControl
             _initialized = true;
         }
 
-        private BindingList<AudioDeviceModel> OutputDevices { get; } = new BindingList<AudioDeviceModel>();
-        private BindingList<AudioSessionModel> AudioSessions1 { get; } = new BindingList<AudioSessionModel>();
-        private BindingList<AudioSessionModel> AudioSessions2 { get; } = new BindingList<AudioSessionModel>();
-        private BindingList<AudioSessionModel> AudioSessions3 { get; } = new BindingList<AudioSessionModel>();
+        private BindingList<AudioDeviceModel> OutputDevices { get; } = new();
+        private BindingList<AudioSessionModel> AudioSessions1 { get; } = new();
+        private BindingList<AudioSessionModel> AudioSessions2 { get; } = new();
+        private BindingList<AudioSessionModel> AudioSessions3 { get; } = new();
 
         private void UpdateAudioSessions()
         {
@@ -102,7 +102,7 @@ namespace ArduinoVolumeControl
                 return;
             }
 
-            if (!string.IsNullOrEmpty(_selectedDevice.Id))
+            if (_selectedDevice != null)
             {
                 // first detach the current selected output device
                 _audioService.DetachOutputDeviceVolumeChanged(_selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
@@ -111,7 +111,7 @@ namespace ArduinoVolumeControl
             // then get the new selected device
             _selectedDevice = (AudioDeviceModel) ((ComboBox)sender).SelectedItem;
 
-            if (string.IsNullOrEmpty(_selectedDevice.Id))
+            if (_selectedDevice == null)
             {
                 SwitchOutputVolumeSlider.Value = 0;
                 SwitchOutputVolumeSlider.Enabled = false;
@@ -222,7 +222,7 @@ namespace ArduinoVolumeControl
 
         # region UpdateVolumeSliders
 
-        private void UpdateSwitchOutputVolumeSlider(string id)
+        private void UpdateSwitchOutputVolumeSlider(Guid id)
         {
             if (SwitchOutputVolumeSlider.InvokeRequired)
             {
@@ -236,38 +236,38 @@ namespace ArduinoVolumeControl
 
         private void UpdateAudioSessionVolumeSlider1(string id)
         {
-            if (AudioSessionVolumeSlider1.InvokeRequired)
+            /*if (AudioSessionVolumeSlider1.InvokeRequired)
             {
                 AudioSessionVolumeSlider1.Invoke((MethodInvoker) (() => UpdateAudioSessionVolumeSlider1(id)));
             }
             else
             {
                 AudioSessionVolumeSlider1.Value = _audioService.GetAudioSessionVolume(id);
-            }
+            }*/
         }
 
         private void UpdateAudioSessionVolumeSlider2(string id)
         {
-            if (AudioSessionVolumeSlider2.InvokeRequired)
+            /*if (AudioSessionVolumeSlider2.InvokeRequired)
             {
                 AudioSessionVolumeSlider2.Invoke((MethodInvoker) (() => UpdateAudioSessionVolumeSlider2(id)));
             }
             else
             {
                 AudioSessionVolumeSlider2.Value = _audioService.GetAudioSessionVolume(id);
-            }
+            }*/
         }
 
         private void UpdateAudioSessionVolumeSlider3(string id)
         {
-            if (AudioSessionVolumeSlider3.InvokeRequired)
+            /*if (AudioSessionVolumeSlider3.InvokeRequired)
             {
                 AudioSessionVolumeSlider3.Invoke((MethodInvoker) (() => UpdateAudioSessionVolumeSlider3(id)));
             }
             else
             {
                 AudioSessionVolumeSlider3.Value = _audioService.GetAudioSessionVolume(id);
-            }
+            }*/
         }
 
         # endregion UpdateVolumeSliders

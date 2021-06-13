@@ -1,5 +1,8 @@
 ﻿using System;
-using CoreAudio;
+using System.Collections.Generic;
+using AudioSwitcher.AudioApi;
+using AudioSwitcher.AudioApi.CoreAudio;
+using AudioSwitcher.AudioApi.Session;
 
 namespace SimpleConsoleForTesting
 {
@@ -7,16 +10,24 @@ namespace SimpleConsoleForTesting
     {
         static void Main(string[] args)
         {
-            MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
-            MMDevice device = deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-            SessionCollection sessions = device.AudioSessionManager2.Sessions;
-            foreach (AudioSessionControl2 session in sessions)
+            CoreAudioController audioController = new CoreAudioController();
+
+            IEnumerable<CoreAudioDevice> devices = audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
+
+            foreach (CoreAudioDevice device in devices)
             {
-                Console.WriteLine($"Session Identifier: {session.GetSessionIdentifier}");
-                Console.WriteLine($"Session Name: {session.DisplayName}");
-                Console.WriteLine($"Session IconPath: {session.IconPath}");
-                Console.WriteLine("===================");
+                Console.WriteLine($"name: {device.Name} || fullname: {device.FullName} || volume: {device.Volume}");
+
+
+                IEnumerable<IAudioSession> audioSessions = device.GetCapability<IAudioSessionController>().ActiveSessions();
+                foreach (IAudioSession audioSession in audioSessions)
+                {
+                    Console.WriteLine(audioSession.DisplayName);
+                }
             }
+
+
+
         }
     }
 }
