@@ -11,7 +11,6 @@ namespace AVCLib.Services
 {
     public class AudioService
     {
-
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
         private readonly CoreAudioController _audioController;
@@ -19,10 +18,8 @@ namespace AVCLib.Services
         public AudioService()
         {
             _audioController = new CoreAudioController();
-
-
-
         }
+
         public List<AudioDeviceModel> GetActiveOutputDevices()
         {
             IEnumerable<CoreAudioDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
@@ -48,15 +45,13 @@ namespace AVCLib.Services
 
         public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
         {
+            _audioSessions.Clear();
+
             CoreAudioDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
             IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
 
             foreach (IAudioSession session in sessions)
             {
-                Console.WriteLine($"Session Identifier: {session.Id}");
-                Console.WriteLine($"Session Name: {session.DisplayName}");
-                Console.WriteLine($"Session IconPath: {session.IconPath}");
-
                 AudioSessionModel audioSession = new()
                 {
                     Id = session.Id,
@@ -68,6 +63,8 @@ namespace AVCLib.Services
                     Volume = (int) session.Volume,
                     Muted = session.IsMuted
                 };
+                session.VolumeChanged.When(x => audioSession.UpdateVolume(x.Volume));
+
                 // session.OnChannelVolumeChanged += audioSession.ChannelVolumeChanged;
                 // session.OnSimpleVolumeChanged += audioSession.SimpleVolumeChanged;
                 // session.OnStateChanged += audioSession.StateChanged;
@@ -99,7 +96,7 @@ namespace AVCLib.Services
             _audioController.GetDevice(id).SetAsDefault();
         }
 
-        public void SetVolume(Guid id, int value)
+        public void SetDeviceVolume(Guid id, int value)
         {
             _audioController.GetDevice(id).SetVolumeAsync(value);
         }
@@ -109,10 +106,10 @@ namespace AVCLib.Services
             return _outputDevices.Single(m => m.Id == id).Volume;
         }
 
-        // public int GetAudioSessionVolume(string id)
-        // {
-        //     return _audioSessions.Single(m => m.SessionIdentifier == id).Volume;
-        // }
+        public int GetAudioSessionVolume(string id)
+        {
+            return _audioSessions.Single(m => m.Id == id).Volume;
+        }
 
         public void AttachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
         {
@@ -122,6 +119,23 @@ namespace AVCLib.Services
         public void DetachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
         {
             _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged -= callbackFunction;
+        }
+
+        public void AttachSessionVolumeChanged(string id, Action<string> callbackFunction)
+        {
+            _audioSessions.Single(m => m.Id == id).OnSessionVolumeChanged += callbackFunction;
+        }
+
+        public void DetachSessionVolumeChanged(string id, Action<string> callbackFunction)
+        {
+            _audioSessions.Single(m => m.Id == id).OnSessionVolumeChanged -= callbackFunction;
+        }
+
+        public void SetSessionVolume(string id, int value)
+        {
+            CoreAudioDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
+            IAudioSession session = audioDevice.GetCapability<IAudioSessionController>().All().Single(s => s.Id == id);
+            session.SetVolumeAsync(value);
         }
     }
 }

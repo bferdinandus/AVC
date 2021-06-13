@@ -6,10 +6,10 @@ namespace AVCLib.Models
     {
         public Guid Id { get; set; }
         public string FullName { get; set; }
-        public bool Selected { get; set; }
         public bool Muted { get; set; }
         public int Volume { get; set; }
         public event Action<Guid> OnOutputDeviceVolumeChanged;
+        public bool Selected { get; set; }
 
         public bool UpdateVolume(double volume)
         {
