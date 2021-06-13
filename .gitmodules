@@ -1,3 +1,0 @@
-[submodule "CoreAudio"]
-	path = CoreAudio
-	url = git@github.com:bferdinandus/CoreAudio.git
