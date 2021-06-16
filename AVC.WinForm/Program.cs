@@ -1,8 +1,8 @@
 using System;
 using System.Windows.Forms;
-using AVCLib.Services;
+using AVC.Core.Services;
 
-namespace ArduinoVolumeControl
+namespace AVC.WinForm
 {
     internal static class Program
     {

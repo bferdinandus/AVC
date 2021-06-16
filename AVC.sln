@@ -1,14 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVCLib", "AVCLib\AVCLib.csproj", "{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.Core", "AVC.Core\AVC.Core.csproj", "{B9F14063-9D3D-4C00-BC91-BABC9F119AC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoVolumeControl", "ArduinoVolumeControl\ArduinoVolumeControl.csproj", "{E89E3982-3982-42F3-BA08-82E042FC608D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.WinForm", "AVC.WinForm\AVC.WinForm.csproj", "{E89E3982-3982-42F3-BA08-82E042FC608D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleConsoleForTesting", "SimpleConsoleForTesting\SimpleConsoleForTesting.csproj", "{E55117B2-11F5-4ED8-BAA3-070A04404CBE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSwitcher.AudioApi", "AudioSwitcher\AudioSwitcher.AudioApi\AudioSwitcher.AudioApi.csproj", "{A2A6F329-355F-4369-A30F-226C1997B227}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSwitcher.AudioApi.CoreAudio", "AudioSwitcher\AudioSwitcher.AudioApi.CoreAudio\AudioSwitcher.AudioApi.CoreAudio.csproj", "{787C058D-4791-40CE-B11E-029268279518}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.Wpf", "AVC.Wpf\AVC.Wpf.csproj", "{5861534A-4E42-44CF-83C3-A5907840FE8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{787C058D-4791-40CE-B11E-029268279518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{787C058D-4791-40CE-B11E-029268279518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{787C058D-4791-40CE-B11E-029268279518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

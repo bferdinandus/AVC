@@ -1,7 +1,7 @@
 ﻿using System;
 using AudioSwitcher.AudioApi.Session;
 
-namespace AVCLib.Models
+namespace AVC.Core.Models
 {
     public class AudioSessionModel
     {

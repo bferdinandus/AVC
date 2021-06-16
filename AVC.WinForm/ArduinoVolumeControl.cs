@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using AVCLib.Models;
-using AVCLib.Services;
+using AVC.Core.Models;
+using AVC.Core.Services;
 
-namespace ArduinoVolumeControl
+namespace AVC.WinForm
 {
     public partial class ArduinoVolumeControl : Form
     {

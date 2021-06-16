@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace ArduinoVolumeControl
+﻿namespace AVC.WinForm
 {
     partial class ArduinoVolumeControl
     {
@@ -199,7 +197,7 @@ namespace ArduinoVolumeControl
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
-            // ArduinoVolumeControl
+            // AVC.WinForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

@@ -5,9 +5,9 @@ using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
-using AVCLib.Models;
+using AVC.Core.Models;
 
-namespace AVCLib.Services
+namespace AVC.Core.Services
 {
     public class AudioService
     {
