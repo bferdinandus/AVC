@@ -35,7 +35,12 @@ namespace AVC.Core.Services
                     Muted = device.IsMuted
                 };
 
-                device.VolumeChanged.When(c => deviceModel.UpdateVolume(c.Volume));
+                // update the model (and somehow tell the viewModel)
+                device.VolumeChanged.When((DeviceVolumeChangedArgs c) =>
+                {
+                    deviceModel.Volume = (int) c.Device.Volume;
+                    return true;
+                });
 
                 _outputDevices.Add(deviceModel);
             }
@@ -111,6 +116,7 @@ namespace AVC.Core.Services
             return _audioSessions.Single(m => m.Id == id).Volume;
         }
 
+        /*
         public void AttachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
         {
             _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged += callbackFunction;
@@ -130,6 +136,7 @@ namespace AVC.Core.Services
         {
             _audioSessions.Single(m => m.Id == id).OnSessionVolumeChanged -= callbackFunction;
         }
+        */
 
         public void SetSessionVolume(string id, int value)
         {

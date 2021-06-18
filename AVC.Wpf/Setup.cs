@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using MvvmCross.IoC;
+using MvvmCross.Platforms.Wpf.Binding;
 using MvvmCross.Platforms.Wpf.Core;
-using Serilog;
-using Serilog.Extensions.Logging;
 
 namespace AVC.Wpf
 {
@@ -9,18 +9,22 @@ namespace AVC.Wpf
     {
         protected override ILoggerProvider CreateLogProvider()
         {
-            return new SerilogLoggerProvider();
+            return null;
         }
 
         protected override ILoggerFactory CreateLogFactory()
         {
-            // serilog configuration
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .CreateLogger();
-
-            return new SerilogLoggerFactory();
+            return null;
         }
+
+        // protected override void InitializeLastChance(IMvxIoCProvider iocProvider)
+        // {
+        //     base.InitializeLastChance(iocProvider);
+        //
+        //     var builder = new MvxWindowsBindingBuilder();
+        //     builder.DoRegistration(iocProvider);
+        // }
+
     }
 
 }

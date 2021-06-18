@@ -7,7 +7,8 @@ namespace AVC.Core
     {
         public override void Initialize()
         {
-            RegisterAppStart<GuestBookViewModel>();
+            RegisterAppStart<VolumeSliderViewModel>();
+            //RegisterAppStart<GuestBookViewModel>();
         }
     }
 }
