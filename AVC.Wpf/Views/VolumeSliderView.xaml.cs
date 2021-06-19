@@ -28,5 +28,10 @@ namespace AVC.Wpf.Views
                     break;
             }
         }
+
+        private void AppVolumeSlider1_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

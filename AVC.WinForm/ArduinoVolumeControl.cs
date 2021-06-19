@@ -76,7 +76,7 @@ namespace AVC.WinForm
                 _selectedDevice = outputDevice;
 
                 // attach slider update function to the device update volume event
-                _audioService.AttachOutputDeviceVolumeChanged(outputDevice.Id, UpdateSwitchOutputVolumeSlider);
+                //_audioService.AttachOutputDeviceVolumeChanged(outputDevice.Id, UpdateSwitchOutputVolumeSlider);
                 UpdateSwitchOutputVolumeSlider(outputDevice.Id);
             }
 
@@ -93,7 +93,7 @@ namespace AVC.WinForm
             if (_selectedDevice != null)
             {
                 // first detach the current selected output device
-                _audioService.DetachOutputDeviceVolumeChanged(_selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
+                //_audioService.DetachOutputDeviceVolumeChanged(_selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
             }
 
             // then get the new selected device
@@ -110,7 +110,7 @@ namespace AVC.WinForm
             SwitchOutputVolumeSlider.Enabled = true;
 
             // attach slider update function to the device update volume event
-            _audioService.AttachOutputDeviceVolumeChanged(_selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
+            //_audioService.AttachOutputDeviceVolumeChanged(_selectedDevice.Id, UpdateSwitchOutputVolumeSlider);
             // activate the chosen device
             _audioService.SelectDeviceById(_selectedDevice.Id);
             // update the audio sessions
@@ -130,7 +130,7 @@ namespace AVC.WinForm
             if (_selectedAudioSession1.Id != null)
             {
                 // first detach the current selected session
-                _audioService.DetachSessionVolumeChanged(_selectedAudioSession1.Id, UpdateAudioSessionVolumeSlider1);
+                //_audioService.DetachSessionVolumeChanged(_selectedAudioSession1.Id, UpdateAudioSessionVolumeSlider1);
                 _selectedAudioSession1.Selected = false;
             }
 
@@ -147,7 +147,7 @@ namespace AVC.WinForm
             {
                 AudioSessionVolumeSlider1.Enabled = true;
                 // attach slider update function to the session update volume event
-                _audioService.AttachSessionVolumeChanged(_selectedAudioSession1.Id, UpdateAudioSessionVolumeSlider1);
+                //_audioService.AttachSessionVolumeChanged(_selectedAudioSession1.Id, UpdateAudioSessionVolumeSlider1);
 
                 UpdateAudioSessionVolumeSlider1(_selectedAudioSession1.Id);
             }
@@ -163,7 +163,7 @@ namespace AVC.WinForm
             if (_selectedAudioSession2.Id != null)
             {
                 // first detach the current selected session
-                _audioService.DetachSessionVolumeChanged(_selectedAudioSession2.Id, UpdateAudioSessionVolumeSlider2);
+                //_audioService.DetachSessionVolumeChanged(_selectedAudioSession2.Id, UpdateAudioSessionVolumeSlider2);
                 _selectedAudioSession2.Selected = false;
             }
 
@@ -179,7 +179,7 @@ namespace AVC.WinForm
             {
                 AudioSessionVolumeSlider2.Enabled = true;
                 // attach slider update function to the session update volume event
-                _audioService.AttachSessionVolumeChanged(_selectedAudioSession2.Id, UpdateAudioSessionVolumeSlider2);
+                //_audioService.AttachSessionVolumeChanged(_selectedAudioSession2.Id, UpdateAudioSessionVolumeSlider2);
 
                 UpdateAudioSessionVolumeSlider2(_selectedAudioSession2.Id);
             }

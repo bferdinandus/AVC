@@ -36,9 +36,9 @@ namespace AVC.Core.Services
                 };
 
                 // update the model (and somehow tell the viewModel)
-                device.VolumeChanged.When((DeviceVolumeChangedArgs c) =>
+                device.VolumeChanged.When(vc =>
                 {
-                    deviceModel.Volume = (int) c.Device.Volume;
+                    deviceModel.Volume = (int) vc.Device.Volume;
                     return true;
                 });
 
@@ -57,7 +57,7 @@ namespace AVC.Core.Services
 
             foreach (IAudioSession session in sessions)
             {
-                AudioSessionModel audioSession = new()
+                AudioSessionModel sessionModel = new()
                 {
                     Id = session.Id,
                     DisplayName = session.DisplayName,
@@ -68,28 +68,18 @@ namespace AVC.Core.Services
                     Volume = (int) session.Volume,
                     Muted = session.IsMuted
                 };
-                session.VolumeChanged.When(x => audioSession.UpdateVolume(x.Volume));
+                // update the model (and somehow tell the viewModel)
+                session.VolumeChanged.When(vc =>
+                {
+                    sessionModel.Volume = (int) vc.Session.Volume;
+                    return true;
+                });
 
-                // session.OnChannelVolumeChanged += audioSession.ChannelVolumeChanged;
-                // session.OnSimpleVolumeChanged += audioSession.SimpleVolumeChanged;
-                // session.OnStateChanged += audioSession.StateChanged;
-
-                _audioSessions.Add(audioSession);
+                _audioSessions.Add(sessionModel);
             }
 
             return _audioSessions;
         }
-
-        /*
-        public AudioDeviceModel GetSelectedDevice()
-        {
-            MMDevice device = _deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-
-            AudioDeviceModel model = _outputDevices.Single(m => m.Id == device.ID);
-
-            return model;
-        }
-        */
 
         public void SelectDeviceById(Guid id)
         {
@@ -115,28 +105,6 @@ namespace AVC.Core.Services
         {
             return _audioSessions.Single(m => m.Id == id).Volume;
         }
-
-        /*
-        public void AttachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
-        {
-            _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged += callbackFunction;
-        }
-
-        public void DetachOutputDeviceVolumeChanged(Guid id, Action<Guid> callbackFunction)
-        {
-            _outputDevices.Single(m => m.Id == id).OnOutputDeviceVolumeChanged -= callbackFunction;
-        }
-
-        public void AttachSessionVolumeChanged(string id, Action<string> callbackFunction)
-        {
-            _audioSessions.Single(m => m.Id == id).OnSessionVolumeChanged += callbackFunction;
-        }
-
-        public void DetachSessionVolumeChanged(string id, Action<string> callbackFunction)
-        {
-            _audioSessions.Single(m => m.Id == id).OnSessionVolumeChanged -= callbackFunction;
-        }
-        */
 
         public void SetSessionVolume(string id, int value)
         {

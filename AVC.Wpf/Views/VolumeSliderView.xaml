@@ -8,26 +8,18 @@
                   xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
                   mc:Ignorable="d"
                   d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid Margin="15">
         <StackPanel>
             <TextBlock>Device Selection</TextBlock>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!--
-                    SelectedValue="{Binding DeviceSelectionComboBoxSelectedValue, Mode=TwoWay}"
-                    SelectedValuePath="Id"
-                -->
                 <ComboBox x:Name="DeviceSelectionComboBox"
                           Margin="0 0 20 0"
-                          SelectedIndex="{Binding DeviceSelectionComboBoxSelectedIndex, Mode=OneWay}"
                           SelectedValue="{Binding DeviceSelectionComboBoxSelectedValue, Mode=TwoWay}"
                           ItemsSource="{Binding AudioDevices, Mode=OneWay}"
                           DisplayMemberPath="FullName"
                           SelectedValuePath="Id"
                           Height="25"
-                          Width="200"
-                          >
-
-
+                          Width="200">
                 </ComboBox>
                 <Slider x:Name="DeviceVolumeSlider"
                         Value="{Binding DeviceVolumeSliderValue, Mode=TwoWay}"
@@ -40,8 +32,30 @@
                         MouseWheel="DeviceVolumeSlider_OnMouseWheel">
                 </Slider>
             </StackPanel>
-            <Button mvx:Bi.nd="Command AudioDeviceChangedCommand"
-                    Margin="50">test</Button>
+
+            <TextBlock>App Selection 1</TextBlock>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <ComboBox x:Name="AppSelectionComboBox1"
+                          Margin="0 0 20 0"
+                          SelectedValue="{Binding AppSelectionComboBox1SelectedValue, Mode=TwoWay}"
+                          ItemsSource="{Binding AudioSessions, Mode=OneWay}"
+                          DisplayMemberPath="FullName"
+                          SelectedValuePath="Id"
+                          Height="25"
+                          Width="200">
+                </ComboBox>
+                <Slider x:Name="AppVolumeSlider1"
+                        Value="{Binding AppVolumeSlider1Value, Mode=TwoWay}"
+                        Width="200"
+                        Minimum="0"
+                        Maximum="100"
+                        TickPlacement="Both"
+                        TickFrequency="10"
+                        LargeChange="20"
+                        MouseWheel="AppVolumeSlider1_OnMouseWheel">
+                </Slider>
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </views:MvxWpfView>

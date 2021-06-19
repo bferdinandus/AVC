@@ -23,18 +23,5 @@ namespace AVC.Core.Models
 
         public bool Selected { get; set; }
 
-        public event Action<string> OnSessionVolumeChanged;
-
-        public bool UpdateVolume(double volume)
-        {
-            Volume = (int) volume;
-
-            if (Selected)
-            {
-                OnSessionVolumeChanged?.Invoke(Id);
-            }
-
-            return true;
-        }
     }
 }
