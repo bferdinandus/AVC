@@ -12,38 +12,48 @@
         <StackPanel>
             <TextBlock>Device Selection</TextBlock>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <ComboBox x:Name="DeviceSelectionComboBox"
-                          Margin="0 0 20 0"
-                          SelectedValue="{Binding DeviceSelectionComboBoxSelectedValue, Mode=TwoWay}"
-                          ItemsSource="{Binding AudioDevices, Mode=OneWay}"
-                          DisplayMemberPath="FullName"
-                          SelectedValuePath="Id"
-                          Height="25"
-                          Width="200">
-                </ComboBox>
+                <ListBox x:Name="DeviceSelectionComboBox"
+                         Margin="0 0 20 0"
+                         SelectedValue="{Binding DeviceSelectionComboBoxSelectedValue, Mode=TwoWay}"
+                         ItemsSource="{Binding AudioDevices, Mode=OneWay}"
+                         SelectedValuePath="Id"
+                         Height="100"
+                         Width="200"
+                         ScrollViewer.VerticalScrollBarVisibility="Visible">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+
+                                <!--<Image Source="{Binding IconPath}" Height="30"></Image>-->
+                                <TextBlock Text="TODo: ShowIcon "></TextBlock>
+                                <TextBlock Text="{Binding FullName}" Background="Chartreuse" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
                 <Slider x:Name="DeviceVolumeSlider"
-                        Value="{Binding DeviceVolumeSliderValue, Mode=TwoWay}"
+                        Value="{Binding DeviceVolumeSliderValue, Mode=OneWay}"
                         Width="200"
                         Minimum="0"
                         Maximum="100"
                         TickPlacement="Both"
                         TickFrequency="10"
                         LargeChange="20"
-                        MouseWheel="DeviceVolumeSlider_OnMouseWheel">
-                </Slider>
+                        MouseWheel="DeviceVolumeSlider_OnMouseWheel" />
             </StackPanel>
 
             <TextBlock>App Selection 1</TextBlock>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <ComboBox x:Name="AppSelectionComboBox1"
-                          Margin="0 0 20 0"
-                          SelectedValue="{Binding AppSelectionComboBox1SelectedValue, Mode=TwoWay}"
-                          ItemsSource="{Binding AudioSessions, Mode=OneWay}"
-                          DisplayMemberPath="FullName"
-                          SelectedValuePath="Id"
-                          Height="25"
-                          Width="200">
-                </ComboBox>
+                <ListBox x:Name="AppSelectionComboBox1"
+                         Margin="0 0 20 0"
+                         SelectedValue="{Binding AppSelectionComboBox1SelectedValue, Mode=TwoWay}"
+                         ItemsSource="{Binding AudioSessions, Mode=TwoWay}"
+                         DisplayMemberPath="DisplayName"
+                         SelectedValuePath="Id"
+                         Height="100"
+                         Width="200"
+                         ScrollViewer.VerticalScrollBarVisibility="Visible" />
                 <Slider x:Name="AppVolumeSlider1"
                         Value="{Binding AppVolumeSlider1Value, Mode=TwoWay}"
                         Width="200"
@@ -52,10 +62,9 @@
                         TickPlacement="Both"
                         TickFrequency="10"
                         LargeChange="20"
-                        MouseWheel="AppVolumeSlider1_OnMouseWheel">
-                </Slider>
+                        MouseWheel="AppVolumeSlider1_OnMouseWheel" />
             </StackPanel>
-
+            <ItemsControl />
         </StackPanel>
     </Grid>
 </views:MvxWpfView>

@@ -9,5 +9,6 @@ namespace AVC.Core.Models
         public bool Muted { get; set; }
         public int Volume { get; set; }
         public bool Selected { get; set; }
+        public string IconPath { get; set; }
     }
 }

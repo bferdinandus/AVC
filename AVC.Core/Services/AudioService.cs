@@ -32,7 +32,8 @@ namespace AVC.Core.Services
                     FullName = device.Name,
                     Selected = device.IsDefaultDevice,
                     Volume = (int) device.Volume,
-                    Muted = device.IsMuted
+                    Muted = device.IsMuted,
+                    IconPath = device.IconPath
                 };
 
                 // update the model (and somehow tell the viewModel)
@@ -50,9 +51,14 @@ namespace AVC.Core.Services
 
         public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
         {
+            return GetAudioSessionsForDevice(_outputDevices.Single(m => m.Selected).Id);
+        }
+
+        public List<AudioSessionModel> GetAudioSessionsForDevice(Guid id)
+        {
             _audioSessions.Clear();
 
-            CoreAudioDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
+            CoreAudioDevice audioDevice = _audioController.GetDevice(id);
             IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
 
             foreach (IAudioSession session in sessions)

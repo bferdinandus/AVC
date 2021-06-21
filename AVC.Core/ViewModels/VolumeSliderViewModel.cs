@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AVC.Core.Models;
 using AVC.Core.Services;
-using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 
 namespace AVC.Core.ViewModels
@@ -13,20 +13,20 @@ namespace AVC.Core.ViewModels
     {
         private readonly AudioService _audioService;
 
-        private List<AudioDeviceModel> _audioDevices = new();
-        private List<AudioSessionModel> _audioSessions = new();
+        private ObservableCollection<AudioDeviceModel> _audioDevices = new();
+        private ObservableCollection<AudioSessionModel> _audioSessions = new();
         private int _deviceVolumeSliderValue;
         private Guid _deviceSelectionComboBoxSelectedValue;
         private int _appVolumeSlider1Value;
-        private Guid _appSelectionComboBox1SelectedValue;
+        private string _appSelectionComboBox1SelectedValue;
 
-        public List<AudioDeviceModel> AudioDevices
+        public ObservableCollection<AudioDeviceModel> AudioDevices
         {
             get => _audioDevices;
             set => SetProperty(ref _audioDevices, value);
         }
 
-        public List<AudioSessionModel> AudioSessions
+        public ObservableCollection<AudioSessionModel> AudioSessions
         {
             get => _audioSessions;
             set => SetProperty(ref _audioSessions, value);
@@ -58,15 +58,18 @@ namespace AVC.Core.ViewModels
             set
             {
                 SetProperty(ref _appVolumeSlider1Value, value);
-                //TODO: update app volume
-                //_audioService.SetDeviceVolume(DeviceSelectionComboBoxSelectedValue, AppVolumeSlider1Value);
+                _audioService.SetSessionVolume(AppSelectionComboBox1SelectedValue, AppVolumeSlider1Value);
             }
         }
 
-        public Guid AppSelectionComboBox1SelectedValue
+        public string AppSelectionComboBox1SelectedValue
         {
             get => _appSelectionComboBox1SelectedValue;
-            set => SetProperty(ref _appSelectionComboBox1SelectedValue, value);
+            set
+            {
+                SetProperty(ref _appSelectionComboBox1SelectedValue, value);
+                AppSessionChanged(value);
+            }
         }
 
         public VolumeSliderViewModel()
@@ -78,7 +81,7 @@ namespace AVC.Core.ViewModels
         {
             await base.Initialize();
 
-            AudioDevices = _audioService.GetActiveOutputDevices();
+            AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
         }
 
@@ -86,7 +89,14 @@ namespace AVC.Core.ViewModels
         {
             _audioService.SelectDeviceById(DeviceSelectionComboBoxSelectedValue);
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
-            // todo: populate app selection 1 combobox
+
+            AudioSessions = new ObservableCollection<AudioSessionModel>(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
+        }
+
+        private void AppSessionChanged(string value)
+        {
+            AudioSessionModel session = AudioSessions.Single(a => a.Id == value);
+            AppVolumeSlider1Value = session.Volume;
         }
     }
 }
