@@ -2,29 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.CoreAudio;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
 using AVC.Core.Models;
+using JetBrains.Annotations;
+using MvvmCross.Plugin.Messenger;
 
 namespace AVC.Core.Services
 {
-    public class AudioService
+    public interface IAudioService
+    {
+        List<AudioDeviceModel> GetActiveOutputDevices();
+        List<AudioSessionModel> GetAudioSessionsForCurrentDevice();
+        List<AudioSessionModel> GetAudioSessionsForDevice(Guid id);
+        void SelectDeviceById(Guid id);
+        void SetDeviceVolume(Guid id, int value);
+        int GetDeviceVolume(Guid id);
+        int GetAudioSessionVolume(string id);
+        void SetSessionVolume(string id, int value);
+    }
+
+    [UsedImplicitly(ImplicitUseKindFlags.Access)]
+    public class AudioService : IAudioService
     {
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
-        private readonly CoreAudioController _audioController;
+        private readonly IAudioController _audioController;
+        private readonly IMvxMessenger _messenger;
 
-        public AudioService()
+        public AudioService(IAudioController audioController, IMvxMessenger messenger)
         {
-            _audioController = new CoreAudioController();
+            _audioController = audioController;
+            _messenger = messenger;
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
         {
-            IEnumerable<CoreAudioDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
+            IEnumerable<IDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
 
-            foreach (CoreAudioDevice device in devices)
+            foreach (IDevice device in devices)
             {
                 AudioDeviceModel deviceModel = new()
                 {
@@ -40,6 +56,9 @@ namespace AVC.Core.Services
                 device.VolumeChanged.When(vc =>
                 {
                     deviceModel.Volume = (int) vc.Device.Volume;
+                    VolumeUpdateMessage message = new(this, deviceModel.Volume);
+                    //_messenger.Publish(message);
+
                     return true;
                 });
 
@@ -58,7 +77,7 @@ namespace AVC.Core.Services
         {
             _audioSessions.Clear();
 
-            CoreAudioDevice audioDevice = _audioController.GetDevice(id);
+            IDevice audioDevice = _audioController.GetDevice(id);
             IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
 
             foreach (IAudioSession session in sessions)
@@ -114,7 +133,7 @@ namespace AVC.Core.Services
 
         public void SetSessionVolume(string id, int value)
         {
-            CoreAudioDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
+            IDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
             IAudioSession session = audioDevice.GetCapability<IAudioSessionController>().All().Single(s => s.Id == id);
             session.SetVolumeAsync(value);
         }

@@ -1,4 +1,10 @@
-﻿using AVC.Core.ViewModels;
+﻿using AudioSwitcher.AudioApi;
+using AudioSwitcher.AudioApi.CoreAudio;
+using AVC.Core.Services;
+using AVC.Core.ViewModels;
+using MvvmCross;
+using MvvmCross.IoC;
+using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 
 namespace AVC.Core
@@ -7,6 +13,14 @@ namespace AVC.Core
     {
         public override void Initialize()
         {
+            // Mvx.IoCProvider.RegisterType => Transient
+            Mvx.IoCProvider.RegisterSingleton<IAudioController>(new CoreAudioController());
+            Mvx.IoCProvider.RegisterSingleton<IMvxMessenger>(new MvxMessengerHub());
+
+
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IAudioService, AudioService>();
+
+
             RegisterAppStart<VolumeSliderViewModel>();
             //RegisterAppStart<GuestBookViewModel>();
         }

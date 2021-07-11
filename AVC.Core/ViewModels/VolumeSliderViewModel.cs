@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using AVC.Core.Models;
 using AVC.Core.Services;
+using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 
 namespace AVC.Core.ViewModels
 {
     public class VolumeSliderViewModel : MvxViewModel
     {
-        private readonly AudioService _audioService;
+        private readonly IAudioService _audioService;
 
         private ObservableCollection<AudioDeviceModel> _audioDevices = new();
         private ObservableCollection<AudioSessionModel> _audioSessions = new();
@@ -19,6 +20,7 @@ namespace AVC.Core.ViewModels
         private Guid _deviceSelectionComboBoxSelectedValue;
         private int _appVolumeSlider1Value;
         private string _appSelectionComboBox1SelectedValue;
+        private readonly MvxSubscriptionToken _token;
 
         public ObservableCollection<AudioDeviceModel> AudioDevices
         {
@@ -72,9 +74,17 @@ namespace AVC.Core.ViewModels
             }
         }
 
-        public VolumeSliderViewModel()
+        public VolumeSliderViewModel(IAudioService audioService, IMvxMessenger messenger)
         {
-            _audioService = new AudioService();
+            _audioService = audioService;
+
+            _token = messenger.Subscribe<VolumeUpdateMessage>(OnVolumeUpdate);
+        }
+
+        private void OnVolumeUpdate(VolumeUpdateMessage obj)
+        {
+
+            // DeviceVolumeSliderValue = obj.Volume;
         }
 
         public override async Task Initialize()

@@ -10,11 +10,11 @@ namespace SimpleConsoleForTesting
     {
         static void Main(string[] args)
         {
-            CoreAudioController audioController = new CoreAudioController();
+            IAudioController audioController = new CoreAudioController();
 
-            IEnumerable<CoreAudioDevice> devices = audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
+            IEnumerable<IDevice> devices = audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
 
-            foreach (CoreAudioDevice device in devices)
+            foreach (IDevice device in devices)
             {
                 Console.WriteLine($"name: {device.Name} || fullname: {device.FullName} || volume: {device.Volume}");
 

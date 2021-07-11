@@ -10,7 +10,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
       <PackageReference Include="MvvmCross" Version="8.0.1" />
+      <PackageReference Include="MvvmCross.Plugin.Messenger" Version="8.0.1" />
     </ItemGroup>
 
 </Project>
