@@ -6,6 +6,7 @@ using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
 using AVC.Core.Models;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using MvvmCross.Plugin.Messenger;
 
 namespace AVC.Core.Services
@@ -29,11 +30,15 @@ namespace AVC.Core.Services
         private readonly List<AudioSessionModel> _audioSessions = new();
         private readonly IAudioController _audioController;
         private readonly IMvxMessenger _messenger;
+        private readonly ILogger<AudioService> _logger;
 
-        public AudioService(IAudioController audioController, IMvxMessenger messenger)
+        public AudioService(IAudioController audioController,
+            IMvxMessenger messenger,
+            ILogger<AudioService> logger)
         {
             _audioController = audioController;
             _messenger = messenger;
+            _logger = logger;
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
@@ -55,9 +60,11 @@ namespace AVC.Core.Services
                 // update the model (and somehow tell the viewModel)
                 device.VolumeChanged.When(vc =>
                 {
+                    _logger.LogInformation($"Device volume changed. {vc.Device.Volume}");
+
                     deviceModel.Volume = (int) vc.Device.Volume;
                     VolumeUpdateMessage message = new(this, deviceModel.Volume);
-                    //_messenger.Publish(message);
+                    _messenger.Publish(message);
 
                     return true;
                 });

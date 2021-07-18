@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AVC.Core.Models;
 using AVC.Core.Services;
+using Microsoft.Extensions.Logging;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 
@@ -12,7 +13,11 @@ namespace AVC.Core.ViewModels
 {
     public class VolumeSliderViewModel : MvxViewModel
     {
+        // ReSharper disable once NotAccessedField.Local
+        private readonly MvxSubscriptionToken _token;
         private readonly IAudioService _audioService;
+        private readonly ILogger<VolumeSliderViewModel> _logger;
+        private bool _updateAudioDevice = true;
 
         private ObservableCollection<AudioDeviceModel> _audioDevices = new();
         private ObservableCollection<AudioSessionModel> _audioSessions = new();
@@ -20,7 +25,6 @@ namespace AVC.Core.ViewModels
         private Guid _deviceSelectionComboBoxSelectedValue;
         private int _appVolumeSlider1Value;
         private string _appSelectionComboBox1SelectedValue;
-        private readonly MvxSubscriptionToken _token;
 
         public ObservableCollection<AudioDeviceModel> AudioDevices
         {
@@ -39,7 +43,21 @@ namespace AVC.Core.ViewModels
             get => _deviceVolumeSliderValue;
             set
             {
+                if (value == _deviceVolumeSliderValue)
+                {
+                    return;
+                }
+
+                _logger.LogInformation($"DeviceVolumeSliderValue old value: {_deviceVolumeSliderValue} new value: {value}");
+
                 SetProperty(ref _deviceVolumeSliderValue, value);
+
+                if (!_updateAudioDevice)
+                {
+                    return;
+                }
+
+                _logger.LogInformation($"Updating the audioDevice.");
                 _audioService.SetDeviceVolume(DeviceSelectionComboBoxSelectedValue, DeviceVolumeSliderValue);
             }
         }
@@ -74,18 +92,16 @@ namespace AVC.Core.ViewModels
             }
         }
 
-        public VolumeSliderViewModel(IAudioService audioService, IMvxMessenger messenger)
+        public VolumeSliderViewModel(IAudioService audioService,
+                                     IMvxMessenger messenger,
+                                     ILogger<VolumeSliderViewModel> logger)
         {
             _audioService = audioService;
+            _logger = logger;
 
             _token = messenger.Subscribe<VolumeUpdateMessage>(OnVolumeUpdate);
         }
 
-        private void OnVolumeUpdate(VolumeUpdateMessage obj)
-        {
-
-            // DeviceVolumeSliderValue = obj.Volume;
-        }
 
         public override async Task Initialize()
         {
@@ -93,6 +109,13 @@ namespace AVC.Core.ViewModels
 
             AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
+        }
+
+        private void OnVolumeUpdate(VolumeUpdateMessage obj)
+        {
+            _updateAudioDevice = false;
+            DeviceVolumeSliderValue = obj.Volume;
+            _updateAudioDevice = true;
         }
 
         public void AudioDeviceChanged()

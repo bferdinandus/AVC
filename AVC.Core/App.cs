@@ -17,12 +17,9 @@ namespace AVC.Core
             Mvx.IoCProvider.RegisterSingleton<IAudioController>(new CoreAudioController());
             Mvx.IoCProvider.RegisterSingleton<IMvxMessenger>(new MvxMessengerHub());
 
-
-            Mvx.IoCProvider.ConstructAndRegisterSingleton<IAudioService, AudioService>();
-
+            Mvx.IoCProvider.LazyConstructAndRegisterSingleton<IAudioService, AudioService>();
 
             RegisterAppStart<VolumeSliderViewModel>();
-            //RegisterAppStart<GuestBookViewModel>();
         }
     }
 }

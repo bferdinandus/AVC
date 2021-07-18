@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using AVC.Core.ViewModels;
 using MvvmCross.Platforms.Wpf.Presenters.Attributes;
@@ -18,15 +20,19 @@ namespace AVC.Wpf.Views
 
         private void DeviceVolumeSlider_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            Slider slider = (Slider) sender;
+            double currentValue = slider.Value;
             switch (e.Delta)
             {
                 case > 0:
-                    ((Slider) sender).Value += 5;
+                    currentValue += 5;
                     break;
                 case < 0:
-                    ((Slider) sender).Value -= 5;
+                    currentValue -= 5;
                     break;
             }
+
+            slider.Value = Math.Max(slider.Minimum, Math.Min(slider.Maximum, currentValue));
         }
 
         private void AppVolumeSlider1_OnMouseWheel(object sender, MouseWheelEventArgs e)
