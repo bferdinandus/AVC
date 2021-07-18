@@ -63,7 +63,7 @@ namespace AVC.Core.Services
                     _logger.LogInformation($"Device volume changed. {vc.Device.Volume}");
 
                     deviceModel.Volume = (int) vc.Device.Volume;
-                    VolumeUpdateMessage message = new(this, deviceModel.Volume);
+                    VolumeUpdateMessage message = new(this, deviceModel.Volume, false);
                     _messenger.Publish(message);
 
                     return true;

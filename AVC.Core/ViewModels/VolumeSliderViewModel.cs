@@ -111,10 +111,12 @@ namespace AVC.Core.ViewModels
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
         }
 
-        private void OnVolumeUpdate(VolumeUpdateMessage obj)
+        private void OnVolumeUpdate(VolumeUpdateMessage message)
         {
-            _updateAudioDevice = false;
-            DeviceVolumeSliderValue = obj.Volume;
+            _updateAudioDevice = message.DoUpdateDeviceVolume;
+            DeviceVolumeSliderValue = message.Volume;
+
+            // always reset to true so that when the UI slider updates the device volume gets updated
             _updateAudioDevice = true;
         }
 
