@@ -1,13 +1,12 @@
-﻿using MvvmCross.Plugin.Messenger;
-
-namespace AVC.Core.Services
+﻿
+namespace AVC.Wpf.Services
 {
-    public class VolumeUpdateMessage : MvxMessage
+    public class VolumeUpdateMessage
     {
         public int Volume { get; private set; }
         public bool DoUpdateDeviceVolume { get; set; }
 
-        public VolumeUpdateMessage(object sender, int volume, bool doUpdateDeviceVolume) : base(sender)
+        public VolumeUpdateMessage(object sender, int volume, bool doUpdateDeviceVolume)
         {
             Volume = volume;
             DoUpdateDeviceVolume = doUpdateDeviceVolume;

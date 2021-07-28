@@ -7,15 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
-      <PackageReference Include="MvvmCross.Platforms.Wpf" Version="8.0.1" />
-      <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
-      <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+        <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AVC.Core\AVC.Core.csproj" />
+      <ProjectReference Include="..\AudioSwitcher\AudioSwitcher.AudioApi.CoreAudio\AudioSwitcher.AudioApi.CoreAudio.csproj" />
+      <ProjectReference Include="..\AudioSwitcher\AudioSwitcher.AudioApi\AudioSwitcher.AudioApi.csproj" />
     </ItemGroup>
 
 </Project>

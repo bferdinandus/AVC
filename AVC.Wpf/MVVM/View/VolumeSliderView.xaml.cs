@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AVC.Core.ViewModels;
-using MvvmCross.Platforms.Wpf.Presenters.Attributes;
-using MvvmCross.Platforms.Wpf.Views;
-using MvvmCross.ViewModels;
 
-namespace AVC.Wpf.Views
+namespace AVC.Wpf.MVVM.View
 {
-    [MvxContentPresentation]
-    [MvxViewFor(typeof(VolumeSliderViewModel))]
-    public partial class VolumeSliderView : MvxWpfView
+    public partial class VolumeSliderView : UserControl
     {
         public VolumeSliderView()
         {
@@ -37,7 +30,7 @@ namespace AVC.Wpf.Views
 
         private void AppVolumeSlider1_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

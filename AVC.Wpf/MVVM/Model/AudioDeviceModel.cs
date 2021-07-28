@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AVC.Core.Models
+namespace AVC.Wpf.MVVM.Model
 {
     public class AudioDeviceModel
     {
