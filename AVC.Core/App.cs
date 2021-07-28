@@ -19,6 +19,8 @@ namespace AVC.Core
 
             Mvx.IoCProvider.LazyConstructAndRegisterSingleton<IAudioService, AudioService>();
 
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<ISerialCommunication, SerialCommunication>();
+
             RegisterAppStart<VolumeSliderViewModel>();
         }
     }
