@@ -6,9 +6,15 @@
                   xmlns:local="clr-namespace:AVC.Wpf.Views"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                   xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
+                  xmlns:viewModels="clr-namespace:AVC.Core.ViewModels;assembly=AVC.Core"
                   mc:Ignorable="d"
                   d:DesignHeight="300" d:DesignWidth="300">
+
     <Grid Margin="15">
+        <Grid.DataContext>
+            <!-- ReSharper disable once Xaml.ConstructorWarning -->
+            <viewModels:VolumeSliderViewModel />
+        </Grid.DataContext>
         <StackPanel>
             <TextBlock>Device Selection</TextBlock>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

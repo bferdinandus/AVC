@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,10 +119,12 @@ namespace AVC.Core.ViewModels
             _updateAudioDevice = true;
         }
 
-        public void AudioDeviceChanged()
+        private void AudioDeviceChanged()
         {
             _audioService.SelectDeviceById(DeviceSelectionComboBoxSelectedValue);
+            _updateAudioDevice = false;
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
+            _updateAudioDevice = true;
 
             AudioSessions = new ObservableCollection<AudioSessionModel>(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
         }
