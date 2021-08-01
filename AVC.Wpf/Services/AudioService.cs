@@ -27,13 +27,15 @@ namespace AVC.Wpf.Services
     {
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
+
         private readonly IAudioController _audioController;
+
         //private readonly IMvxMessenger _messenger;
         private readonly ILogger<AudioService> _logger;
 
         public AudioService(IAudioController audioController,
-            //IMvxMessenger messenger,
-            ILogger<AudioService> logger)
+                            //IMvxMessenger messenger,
+                            ILogger<AudioService> logger)
         {
             _audioController = audioController;
             //_messenger = messenger;
@@ -147,7 +149,6 @@ namespace AVC.Wpf.Services
         public void Dispose()
         {
             _logger.LogInformation($"{nameof(AudioService)}.Dispose()");
-            _audioController?.Dispose();
         }
     }
 }
