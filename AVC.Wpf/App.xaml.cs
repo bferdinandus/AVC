@@ -1,16 +1,14 @@
-﻿using MvvmCross.Core;
-using MvvmCross.Platforms.Wpf.Views;
+﻿using System.Windows;
 
 namespace AVC.Wpf
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : MvxApplication
+    public partial class App : Application
     {
-        protected override void RegisterSetup()
+        public App()
         {
-            this.RegisterSetupType<Setup>();
         }
     }
 }
