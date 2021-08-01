@@ -4,12 +4,11 @@ using System.Linq;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
-using AVC.Core.Models;
+using AVC.Wpf.MVVM.Model;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using MvvmCross.Plugin.Messenger;
 
-namespace AVC.Core.Services
+namespace AVC.Wpf.Services
 {
     public interface IAudioService
     {
@@ -24,20 +23,22 @@ namespace AVC.Core.Services
     }
 
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
-    public class AudioService : IAudioService
+    public class AudioService : IAudioService, IDisposable
     {
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
+
         private readonly IAudioController _audioController;
-        private readonly IMvxMessenger _messenger;
+
+        //private readonly IMvxMessenger _messenger;
         private readonly ILogger<AudioService> _logger;
 
         public AudioService(IAudioController audioController,
-            IMvxMessenger messenger,
-            ILogger<AudioService> logger)
+                            //IMvxMessenger messenger,
+                            ILogger<AudioService> logger)
         {
             _audioController = audioController;
-            _messenger = messenger;
+            //_messenger = messenger;
             _logger = logger;
         }
 
@@ -64,7 +65,7 @@ namespace AVC.Core.Services
 
                     deviceModel.Volume = (int) vc.Device.Volume;
                     VolumeUpdateMessage message = new(this, deviceModel.Volume, false);
-                    _messenger.Publish(message);
+                    //_messenger.Publish(message);
 
                     return true;
                 });
@@ -143,6 +144,11 @@ namespace AVC.Core.Services
             IDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
             IAudioSession session = audioDevice.GetCapability<IAudioSessionController>().All().Single(s => s.Id == id);
             session.SetVolumeAsync(value);
+        }
+
+        public void Dispose()
+        {
+            _logger.LogInformation($"{nameof(AudioService)}.Dispose()");
         }
     }
 }
