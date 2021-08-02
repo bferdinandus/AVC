@@ -8,9 +8,9 @@ using Serilog;
 
 namespace AVC.Wpf
 {
-    public class AppServices
+    public sealed class AppServices : IDisposable
     {
-        public IServiceProvider ServiceProvider { get; }
+        public ServiceProvider ServiceProvider { get; }
 
         private static AppServices _instance;
         private static readonly object InstanceLock = new();
@@ -49,6 +49,11 @@ namespace AVC.Wpf
 
 
             ServiceProvider = services.BuildServiceProvider();
+        }
+
+        public void Dispose()
+        {
+            ServiceProvider?.Dispose();
         }
     }
 }
