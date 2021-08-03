@@ -47,6 +47,9 @@ namespace AVC.Wpf
 
             // stateful services (scoped)
 
+            // singletons
+            services.AddSingleton<ISerialCommunication, SerialCommunication>();
+
 
             ServiceProvider = services.BuildServiceProvider();
         }
