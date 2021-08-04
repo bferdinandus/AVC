@@ -43,13 +43,13 @@ namespace AVC.Wpf
             services.AddTransient<MainWindow>();
 
             // services (transient)
-            services.AddTransient<IAudioController, CoreAudioController>();
-            services.AddTransient<IAudioService, AudioService>();
 
             // stateful services (scoped)
+            services.AddScoped<IAudioController, CoreAudioController>();
+            services.AddScoped<IAudioService, AudioService>();
+            services.AddScoped<ISerialCommunication, SerialCommunication>();
 
             // service (singleton)
-            services.AddSingleton<ISerialCommunication, SerialCommunication>();
 
 
             ServiceProvider = services.BuildServiceProvider();

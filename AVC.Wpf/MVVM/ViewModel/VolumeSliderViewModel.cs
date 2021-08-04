@@ -5,10 +5,11 @@ using AVC.Wpf.Core;
 using AVC.Wpf.MVVM.Model;
 using AVC.Wpf.Services;
 using Microsoft.Extensions.Logging;
+using PubSubNET;
 
 namespace AVC.Wpf.MVVM.ViewModel
 {
-    public class VolumeSliderViewModel : ObservableObject
+    public class VolumeSliderViewModel : ObservableObject, IDisposable
     {
         private readonly IAudioService _audioService;
         private readonly ILogger<VolumeSliderViewModel> _logger;
@@ -24,13 +25,21 @@ namespace AVC.Wpf.MVVM.ViewModel
         public ObservableCollection<AudioDeviceModel> AudioDevices
         {
             get => _audioDevices;
-            set => _audioDevices = value;
+            set
+            {
+                _audioDevices = value;
+                OnPropertyChanged();
+            }
         }
 
         public ObservableCollection<AudioSessionModel> AudioSessions
         {
             get => _audioSessions;
-            set => _audioSessions = value;
+            set
+            {
+                _audioSessions = value;
+                OnPropertyChanged();
+            }
         }
 
         public int DeviceVolumeSliderValue
@@ -46,6 +55,7 @@ namespace AVC.Wpf.MVVM.ViewModel
                 _logger.LogInformation($"DeviceVolumeSliderValue old value: {_deviceVolumeSliderValue} new value: {value}");
 
                 _deviceVolumeSliderValue = value;
+                OnPropertyChanged();
 
                 if (!_updateAudioDevice)
                 {
@@ -63,6 +73,8 @@ namespace AVC.Wpf.MVVM.ViewModel
             set
             {
                 _deviceSelectionComboBoxSelectedValue = value;
+                OnPropertyChanged();
+
                 AudioDeviceChanged();
             }
         }
@@ -73,6 +85,8 @@ namespace AVC.Wpf.MVVM.ViewModel
             set
             {
                 _appVolumeSlider1Value = value;
+                OnPropertyChanged();
+
                 _audioService.SetSessionVolume(AppSelectionComboBox1SelectedValue, AppVolumeSlider1Value);
             }
         }
@@ -83,6 +97,8 @@ namespace AVC.Wpf.MVVM.ViewModel
             set
             {
                 _appSelectionComboBox1SelectedValue = value;
+                OnPropertyChanged();
+
                 AppSessionChanged(value);
             }
         }
@@ -97,11 +113,12 @@ namespace AVC.Wpf.MVVM.ViewModel
             AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
 
-            //_token = messenger.Subscribe<VolumeUpdateMessage>(OnVolumeUpdate);
+            PubSub.Subscribe<VolumeSliderViewModel, VolumeUpdateMessage>(this, OnVolumeUpdate);
         }
 
         private void OnVolumeUpdate(VolumeUpdateMessage message)
         {
+            _logger.LogInformation($"{nameof(VolumeSliderViewModel)}.{nameof(OnVolumeUpdate)}()");
             _updateAudioDevice = message.DoUpdateDeviceVolume;
             DeviceVolumeSliderValue = message.Volume;
 
@@ -123,6 +140,12 @@ namespace AVC.Wpf.MVVM.ViewModel
         {
             AudioSessionModel session = AudioSessions.Single(a => a.Id == value);
             AppVolumeSlider1Value = session.Volume;
+        }
+
+        public void Dispose()
+        {
+            _logger.LogInformation($"{nameof(VolumeSliderViewModel)}.{nameof(Dispose)}()");
+            PubSub.Unsubscribe<VolumeSliderViewModel, VolumeUpdateMessage>(this);
         }
     }
 }

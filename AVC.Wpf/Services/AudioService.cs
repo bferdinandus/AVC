@@ -7,6 +7,7 @@ using AudioSwitcher.AudioApi.Session;
 using AVC.Wpf.MVVM.Model;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using PubSubNET;
 
 namespace AVC.Wpf.Services
 {
@@ -64,8 +65,8 @@ namespace AVC.Wpf.Services
                     _logger.LogInformation($"Device volume changed. {vc.Device.Volume}");
 
                     deviceModel.Volume = (int) vc.Device.Volume;
-                    VolumeUpdateMessage message = new(this, deviceModel.Volume, false);
-                    //_messenger.Publish(message);
+                    VolumeUpdateMessage message = new(deviceModel.Volume, false);
+                    PubSub.Publish(message);
 
                     return true;
                 });
