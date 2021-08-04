@@ -11,6 +11,5 @@ namespace AVC.Wpf.Services
             Volume = volume;
             DoUpdateDeviceVolume = doUpdateDeviceVolume;
         }
-
     }
 }

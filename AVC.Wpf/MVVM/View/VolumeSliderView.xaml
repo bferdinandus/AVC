@@ -6,7 +6,7 @@
              xmlns:viewModel="clr-namespace:AVC.Wpf.MVVM.ViewModel"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             d:DataContext="{d:DesignInstance viewModel:VolumeSliderViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance viewModel:VolumeSliderViewModel}">
     <Grid Margin="15">
         <StackPanel>
             <TextBlock>Device Selection</TextBlock>
