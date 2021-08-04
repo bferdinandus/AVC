@@ -10,7 +10,7 @@ namespace AVC.Wpf
 {
     public sealed class AppServices : IDisposable
     {
-        public ServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         private static AppServices _instance;
         private static readonly object InstanceLock = new();
@@ -40,6 +40,7 @@ namespace AVC.Wpf
 
             // view-models (transient)
             services.AddTransient<VolumeSliderViewModel>();
+            services.AddTransient<MainWindow>();
 
             // services (transient)
             services.AddTransient<IAudioController, CoreAudioController>();
@@ -47,7 +48,7 @@ namespace AVC.Wpf
 
             // stateful services (scoped)
 
-            // singletons
+            // service (singleton)
             services.AddSingleton<ISerialCommunication, SerialCommunication>();
 
 
@@ -56,7 +57,7 @@ namespace AVC.Wpf
 
         public void Dispose()
         {
-            ServiceProvider?.Dispose();
+            ((ServiceProvider) ServiceProvider)?.Dispose();
         }
     }
 }

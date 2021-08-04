@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:viewModel="clr-namespace:AVC.Wpf.MVVM.ViewModel"
-    xmlns:view="clr-namespace:AVC.Wpf.MVVM.View"
-    StartupUri="MainWindow.xaml">
+    xmlns:view="clr-namespace:AVC.Wpf.MVVM.View">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries />

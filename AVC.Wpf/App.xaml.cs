@@ -17,22 +17,26 @@ namespace AVC.Wpf
         public App()
         {
             _scope = AppServices.Instance.ServiceProvider.CreateScope();
-            _logger = _scope.ServiceProvider.GetService<ILogger<App>>();
-            _logger.LogInformation("App()");
-            _serialComm = _scope.ServiceProvider.GetService<ISerialCommunication>();
+            _logger = _scope.ServiceProvider.GetRequiredService<ILogger<App>>();
+            _logger.LogInformation($"{nameof(App)}()");
+            _serialComm = _scope.ServiceProvider.GetRequiredService<ISerialCommunication>();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            _logger.LogInformation($"{nameof(App)}.{nameof(OnStartup)}()");
 
-            _logger.LogInformation($"{nameof(App)}.OnStartup()");
+            MainWindow window = _scope.ServiceProvider.GetRequiredService<MainWindow>();
+            window.Show();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _logger.LogInformation($"{nameof(App)}.OnExit()");
+            _logger.LogInformation($"{nameof(App)}.{nameof(OnExit)}()");
+            _logger.LogInformation("Disposing scope");
             _scope.Dispose();
+            _logger.LogInformation("Disposing ServiceProvider");
             AppServices.Instance.Dispose();
             base.OnExit(e);
         }

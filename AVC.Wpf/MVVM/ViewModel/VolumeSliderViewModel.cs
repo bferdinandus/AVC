@@ -93,7 +93,7 @@ namespace AVC.Wpf.MVVM.ViewModel
             _logger = logger;
             _audioService = audioService;
 
-            _logger.LogInformation("VolumeSlider Constructor");
+            _logger.LogInformation($"{nameof(VolumeSliderViewModel)}()");
             AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
 
