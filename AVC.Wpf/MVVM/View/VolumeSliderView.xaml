@@ -38,7 +38,8 @@
                         TickPlacement="Both"
                         TickFrequency="10"
                         LargeChange="20"
-                        MouseWheel="DeviceVolumeSlider_OnMouseWheel" />
+                        MouseWheel="DeviceVolumeSlider_OnMouseWheel">
+                </Slider>
             </StackPanel>
 
             <TextBlock>App Selection 1</TextBlock>
@@ -59,8 +60,7 @@
                         Maximum="100"
                         TickPlacement="Both"
                         TickFrequency="10"
-                        LargeChange="20"
-                        MouseWheel="AppVolumeSlider1_OnMouseWheel" />
+                        LargeChange="20" />
             </StackPanel>
             <ItemsControl />
         </StackPanel>

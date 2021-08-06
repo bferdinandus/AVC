@@ -17,8 +17,7 @@ namespace AVC.Wpf
 
         private static AppServices GetInstance()
         {
-            lock (InstanceLock)
-            {
+            lock (InstanceLock) {
                 return _instance ??= new AppServices();
             }
         }
@@ -31,9 +30,9 @@ namespace AVC.Wpf
 
             // logging configuration
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.Debug()
-                .CreateLogger();
+                         .MinimumLevel.Verbose()
+                         .WriteTo.Debug()
+                         .CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
             Log.Logger.Verbose("AppServices initializing.");
             services.AddLogging(builder => { builder.AddSerilog(); });
@@ -50,7 +49,6 @@ namespace AVC.Wpf
             services.AddScoped<ISerialCommunication, SerialCommunication>();
 
             // service (singleton)
-
 
             ServiceProvider = services.BuildServiceProvider();
         }
