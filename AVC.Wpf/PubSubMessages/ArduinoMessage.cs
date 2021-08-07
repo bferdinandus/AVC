@@ -1,4 +1,4 @@
-﻿namespace AVC.Wpf.Services
+﻿namespace AVC.Wpf.PubSubMessages
 {
     public class ArduinoMessage
     {

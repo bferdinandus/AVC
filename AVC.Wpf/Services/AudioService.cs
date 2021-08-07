@@ -5,6 +5,7 @@ using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
 using AVC.Wpf.MVVM.Model;
+using AVC.Wpf.PubSubMessages;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using PubSubNET;

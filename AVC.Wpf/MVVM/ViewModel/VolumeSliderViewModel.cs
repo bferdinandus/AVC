@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using AVC.Wpf.Core;
 using AVC.Wpf.MVVM.Model;
+using AVC.Wpf.PubSubMessages;
 using AVC.Wpf.Services;
 using Microsoft.Extensions.Logging;
 using PubSubNET;
