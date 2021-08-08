@@ -1,7 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
 using System.Windows;
 using AVC.Wpf.MVVM.ViewModel;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace AVC.Wpf
@@ -11,7 +10,7 @@ namespace AVC.Wpf
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IServiceScope _scope;
+        private readonly ILogger _logger;
 
         public VolumeSliderViewModel ViewModel { get; }
 
@@ -19,16 +18,20 @@ namespace AVC.Wpf
         {
             InitializeComponent();
 
-            _scope = AppServices.Instance.ServiceProvider.CreateScope();
-            Closed += (sender, e) => _scope.Dispose();
-
-            ILogger<MainWindow> logger = _scope.ServiceProvider.GetRequiredService<ILogger<MainWindow>>();
-            logger.LogInformation("Main Window Starting");
-
-            ViewModel = _scope.ServiceProvider.GetRequiredService<VolumeSliderViewModel>();
-
             DataContext = this;
         }
 
+        public MainWindow(ILogger<MainWindow> logger, VolumeSliderViewModel viewModel) : this()
+        {
+            _logger = logger;
+            ViewModel = viewModel;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _logger.LogInformation($"{nameof(MainWindow)}.OnClosed()");
+
+            base.OnClosed(e);
+        }
     }
 }

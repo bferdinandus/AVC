@@ -8,7 +8,7 @@ using Serilog;
 
 namespace AVC.Wpf
 {
-    public class AppServices
+    public sealed class AppServices : IDisposable
     {
         public IServiceProvider ServiceProvider { get; }
 
@@ -17,8 +17,7 @@ namespace AVC.Wpf
 
         private static AppServices GetInstance()
         {
-            lock (InstanceLock)
-            {
+            lock (InstanceLock) {
                 return _instance ??= new AppServices();
             }
         }
@@ -31,24 +30,32 @@ namespace AVC.Wpf
 
             // logging configuration
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.Debug()
-                .CreateLogger();
+                         .MinimumLevel.Verbose()
+                         .WriteTo.Debug()
+                         .CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
             Log.Logger.Verbose("AppServices initializing.");
             services.AddLogging(builder => { builder.AddSerilog(); });
 
             // view-models (transient)
             services.AddTransient<VolumeSliderViewModel>();
+            services.AddTransient<MainWindow>();
 
             // services (transient)
-            services.AddTransient<IAudioController, CoreAudioController>();
-            services.AddTransient<IAudioService, AudioService>();
 
             // stateful services (scoped)
+            services.AddScoped<IAudioController, CoreAudioController>();
+            services.AddScoped<IAudioService, AudioService>();
+            services.AddScoped<ISerialCommunication, SerialCommunication>();
 
+            // service (singleton)
 
             ServiceProvider = services.BuildServiceProvider();
+        }
+
+        public void Dispose()
+        {
+            ((ServiceProvider) ServiceProvider)?.Dispose();
         }
     }
 }

@@ -6,8 +6,7 @@ namespace AVC.Wpf.MVVM.Model
     {
         private string _displayName;
 
-        public string DisplayName
-        {
+        public string DisplayName {
             get => IsSystemSoundsSession ? "System Sound" : _displayName;
             set => _displayName = value;
         }

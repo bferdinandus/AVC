@@ -15,8 +15,7 @@ namespace AVC.Wpf.MVVM.View
         {
             Slider slider = (Slider) sender;
             double currentValue = slider.Value;
-            switch (e.Delta)
-            {
+            switch (e.Delta) {
                 case > 0:
                     currentValue += 5;
                     break;
@@ -26,11 +25,6 @@ namespace AVC.Wpf.MVVM.View
             }
 
             slider.Value = Math.Max(slider.Minimum, Math.Min(slider.Maximum, currentValue));
-        }
-
-        private void AppVolumeSlider1_OnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }
