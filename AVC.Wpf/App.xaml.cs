@@ -3,8 +3,6 @@ using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
 using AVC.Wpf.MVVM.Views;
 using AVC.Wpf.Services;
-using DryIoc;
-using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -17,23 +15,26 @@ namespace AVC.Wpf
     /// </summary>
     public partial class App : PrismApplication
     {
-        protected override IContainerExtension CreateContainerExtension()
+        public App()
         {
-            // https://www.andicode.com/prism/wpf/logging/2021/05/21/Logging-In-Prism.html
-
             // Configure Serilog and the sinks at the startup of the app
             Log.Logger = new LoggerConfiguration()
                          .MinimumLevel.Verbose()
                          .Enrich.FromLogContext()
                          .WriteTo.Debug()
                          .CreateLogger();
+        }
 
+        protected override IContainerExtension CreateContainerExtension()
+        {
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(CreateContainerExtension));
-            ServiceCollection serviceCollection = new();
-            serviceCollection.AddLogging(loggingBuilder =>
-                                             loggingBuilder.AddSerilog(dispose: true));
+            IContainerExtension containerExtension = base.CreateContainerExtension();
 
-            return new DryIocContainerExtension(new Container(CreateContainerRules()).WithDependencyInjectionAdapter(serviceCollection));
+            containerExtension.RegisterServices(services => {
+                services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+            });
+
+            return containerExtension;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
