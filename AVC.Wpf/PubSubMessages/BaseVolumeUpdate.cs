@@ -1,10 +1,10 @@
 ﻿namespace AVC.Wpf.PubSubMessages
 {
-    public class ArduinoDeviceVolumeUpdate
+    public abstract class BaseVolumeUpdate
     {
         public int Volume { get; }
 
-        public ArduinoDeviceVolumeUpdate(int volume)
+        protected BaseVolumeUpdate(int volume)
         {
             Volume = volume;
         }
