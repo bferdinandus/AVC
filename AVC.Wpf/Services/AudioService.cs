@@ -18,10 +18,8 @@ namespace AVC.Wpf.Services
         List<AudioSessionModel> GetAudioSessionsForCurrentDevice();
         List<AudioSessionModel> GetAudioSessionsForDevice(Guid id);
         void SelectDeviceById(Guid id);
-        void SetDeviceVolume(Guid id, int value);
         int GetDeviceVolume(Guid id);
         int GetAudioSessionVolume(string id);
-        void SetSessionVolume(string id, int value);
     }
 
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
@@ -33,7 +31,7 @@ namespace AVC.Wpf.Services
         private readonly IAudioController _audioController;
 
         private readonly ILogger<AudioService> _logger;
-        private bool _suppressMessage;
+        private bool _doSendMessage = true;
 
         public AudioService(IAudioController audioController,
                             ILogger<AudioService> logger)
@@ -41,7 +39,8 @@ namespace AVC.Wpf.Services
             _logger = logger;
             _audioController = audioController;
 
-            PubSub.Subscribe<AudioService, ArduinoDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
+            PubSub.Subscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
+            PubSub.Subscribe<AudioService, MainWindowDeviceVolumeUpdate>(this, OnMainWindowDeviceVolumeUpdate);
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
@@ -60,17 +59,13 @@ namespace AVC.Wpf.Services
 
                 // update the model (and somehow tell the viewModel)
                 device.VolumeChanged.When(vc => {
-                    _logger.LogTrace("Device volume changed: {volume:D}", vc.Device.Volume);
+                    _logger.LogTrace("Device volume changed: {volume}", (int) vc.Device.Volume);
 
-                    if (!_suppressMessage) {
-                        deviceModel.Volume = (int) vc.Device.Volume;
-                        AudioServiceDeviceVolumeUpdate message = new(deviceModel.Volume);
-                        PubSub.Publish(message);
-                    } else {
-                        _logger.LogTrace("Message suppressed: {type}", nameof(AudioServiceDeviceVolumeUpdate));
+                    if (_doSendMessage) {
+                        PubSub.Publish(new AudioServiceDeviceVolumeUpdate((int) vc.Device.Volume));
                     }
 
-                    _suppressMessage = false;
+                    _doSendMessage = true;
 
                     return true;
                 });
@@ -129,13 +124,6 @@ namespace AVC.Wpf.Services
             _audioController.GetDevice(id).SetAsDefault();
         }
 
-        public void SetDeviceVolume(Guid id, int value)
-        {
-            _suppressMessage = true;
-
-            _audioController.GetDevice(id).SetVolumeAsync(value);
-        }
-
         public int GetDeviceVolume(Guid id)
         {
             return _outputDevices.Single(m => m.Id == id).Volume;
@@ -146,27 +134,38 @@ namespace AVC.Wpf.Services
             return _audioSessions.Single(m => m.Id == id).Volume;
         }
 
-        public void SetSessionVolume(string id, int value)
+        private void SetSessionVolume(string id, int value)
         {
             IDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
             IAudioSession session = audioDevice.GetCapability<IAudioSessionController>().All().Single(s => s.Id == id);
             session.SetVolumeAsync(value);
         }
 
-        private void SetActiveDeviceVolume(int value)
+        private void SetDeviceVolume(Guid id, int value)
         {
-            SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, value);
+            _doSendMessage = false;
+            _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
-        private void OnArduinoDeviceVolumeUpdate(ArduinoDeviceVolumeUpdate obj)
+        private void OnArduinoDeviceVolumeUpdate(ArduinoServiceDeviceVolumeUpdate obj)
         {
-            SetActiveDeviceVolume(obj.Volume);
+            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnArduinoDeviceVolumeUpdate));
+
+            SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
+        }
+
+        private void OnMainWindowDeviceVolumeUpdate(MainWindowDeviceVolumeUpdate obj)
+        {
+            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnMainWindowDeviceVolumeUpdate));
+
+            SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
         }
 
         public void Dispose()
         {
-            _logger.LogDebug($"{nameof(AudioService)}.Dispose()");
-            PubSub.Unsubscribe<AudioService, ArduinoDeviceVolumeUpdate>(this);
+            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(Dispose));
+            PubSub.Unsubscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this);
+            PubSub.Unsubscribe<AudioService, MainWindowDeviceVolumeUpdate>(this);
         }
     }
 }

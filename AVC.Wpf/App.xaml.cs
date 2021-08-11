@@ -15,15 +15,8 @@ namespace AVC.Wpf
     /// </summary>
     public partial class App : PrismApplication
     {
-        public App()
-        {
-            // Configure Serilog and the sinks at the startup of the app
-            Log.Logger = new LoggerConfiguration()
-                         .MinimumLevel.Verbose()
-                         .Enrich.FromLogContext()
-                         .WriteTo.Debug()
-                         .CreateLogger();
-        }
+        private IArduinoService _arduinoService;
+        private IAudioService _audioService;
 
         protected override IContainerExtension CreateContainerExtension()
         {
@@ -31,6 +24,13 @@ namespace AVC.Wpf
             IContainerExtension containerExtension = base.CreateContainerExtension();
 
             containerExtension.RegisterServices(services => {
+                // Configure Serilog and the sinks at the startup of the app
+                Log.Logger = new LoggerConfiguration()
+                             .MinimumLevel.Debug()
+                             .Enrich.FromLogContext()
+                             .WriteTo.Debug()
+                             .CreateLogger();
+
                 services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
             });
 
@@ -43,7 +43,7 @@ namespace AVC.Wpf
 
             containerRegistry.RegisterSingleton<IAudioController, CoreAudioController>();
             containerRegistry.RegisterSingleton<IAudioService, AudioService>();
-            containerRegistry.RegisterSingleton<ISerialCommunication, SerialCommunication>();
+            containerRegistry.RegisterSingleton<IArduinoService, ArduinoService>();
         }
 
         protected override Window CreateShell()
@@ -56,6 +56,9 @@ namespace AVC.Wpf
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            _arduinoService = Container.Resolve<IArduinoService>();
+            _audioService = Container.Resolve<IAudioService>();
 
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(OnStartup));
         }

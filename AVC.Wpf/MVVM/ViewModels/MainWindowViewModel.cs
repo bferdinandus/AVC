@@ -14,11 +14,9 @@ namespace AVC.Wpf.MVVM.ViewModels
 {
     public class MainWindowViewModel : BindableBase, IDisposable
     {
-        /*
-         * Services
-         */
         private readonly IAudioService _audioService;
         private readonly ILogger<MainWindowViewModel> _logger;
+        private bool _doSendMessage = true;
 
         /*
          * AutoProperties
@@ -67,28 +65,30 @@ namespace AVC.Wpf.MVVM.ViewModels
             _logger.LogTrace("{Class}()", nameof(MainWindowViewModel));
             _audioService = audioService;
 
-            DeviceSelectionComboBoxSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnDeviceSelectionComboBoxSelectionChanged);
-
             AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
 
-            PubSub.Subscribe<MainWindowViewModel, AudioServiceDeviceVolumeUpdate>(this, OnDeviceVolumeUpdate);
+            PubSub.Subscribe<MainWindowViewModel, AudioServiceDeviceVolumeUpdate>(this, OnAudioServiceDeviceVolumeUpdate);
+            PubSub.Subscribe<MainWindowViewModel, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
         }
 
         /*
          * Commands
          */
-        public DelegateCommand<SelectionChangedEventArgs> DeviceSelectionComboBoxSelectionChangedCommand { get; }
 
-        private void OnDeviceSelectionComboBoxSelectionChanged(SelectionChangedEventArgs obj)
+        private DelegateCommand _deviceSelectionComboBoxSelectionChangedCommand;
+
+        public DelegateCommand DeviceSelectionComboBoxSelectionChangedCommand =>
+            _deviceSelectionComboBoxSelectionChangedCommand ??= new DelegateCommand(OnDeviceSelectionComboBoxSelectionChanged);
+
+        private void OnDeviceSelectionComboBoxSelectionChanged()
         {
+            _logger.LogTrace("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnDeviceSelectionComboBoxSelectionChanged));
             _audioService.SelectDeviceById(DeviceSelectionComboBoxSelectedValue);
 
-            // _updateAudioDevice = false;
+            _doSendMessage = false;
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
-
-            // _updateAudioDevice = true;
 
             AudioSessions = new ObservableCollection<AudioSessionModel>(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
         }
@@ -99,21 +99,32 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         private void OnDeviceVolumeSliderValueChanged()
         {
-            _logger.LogTrace("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnDeviceVolumeSliderValueChanged));
-            _audioService.SetDeviceVolume(DeviceSelectionComboBoxSelectedValue, DeviceVolumeSliderValue);
+            _logger.LogDebug("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnDeviceVolumeSliderValueChanged));
+            if (_doSendMessage) {
+                PubSub.Publish(new MainWindowDeviceVolumeUpdate(DeviceVolumeSliderValue));
+            }
+
+            _doSendMessage = true;
         }
 
         /*
          * Other functions
          */
 
-        private void OnDeviceVolumeUpdate(AudioServiceDeviceVolumeUpdate message)
+        private void OnAudioServiceDeviceVolumeUpdate(AudioServiceDeviceVolumeUpdate message)
         {
-            _logger.LogInformation($"{nameof(MainWindowViewModel)}.{nameof(OnDeviceVolumeUpdate)}()");
+            _logger.LogDebug("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnAudioServiceDeviceVolumeUpdate));
 
-            // _updateAudioDevice = false;
+            _doSendMessage = false;
             DeviceVolumeSliderValue = message.Volume;
-            // _updateAudioDevice = true;
+        }
+
+        private void OnArduinoDeviceVolumeUpdate(ArduinoServiceDeviceVolumeUpdate message)
+        {
+            _logger.LogDebug("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnArduinoDeviceVolumeUpdate));
+
+            _doSendMessage = false;
+            DeviceVolumeSliderValue = message.Volume;
         }
 
         private void AudioDeviceChanged() {}
@@ -129,9 +140,10 @@ namespace AVC.Wpf.MVVM.ViewModels
          */
         public void Dispose()
         {
-            _logger.LogTrace("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(Dispose));
+            _logger.LogDebug("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(Dispose));
 
             PubSub.Unsubscribe<MainWindowViewModel, AudioServiceDeviceVolumeUpdate>(this);
+            PubSub.Unsubscribe<MainWindowViewModel, ArduinoServiceDeviceVolumeUpdate>(this);
         }
     }
 }

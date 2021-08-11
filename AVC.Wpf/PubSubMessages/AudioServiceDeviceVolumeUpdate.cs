@@ -1,12 +1,7 @@
 ﻿namespace AVC.Wpf.PubSubMessages
 {
-    public class AudioServiceDeviceVolumeUpdate
+    public class AudioServiceDeviceVolumeUpdate : BaseVolumeUpdate
     {
-        public int Volume { get; }
-
-        public AudioServiceDeviceVolumeUpdate(int volume)
-        {
-            Volume = volume;
-        }
+        public AudioServiceDeviceVolumeUpdate(int volume) : base(volume) {}
     }
 }
