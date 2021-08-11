@@ -4,7 +4,7 @@ using System.Linq;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
-using AVC.Wpf.MVVM.Model;
+using AVC.Wpf.MVVM.Models;
 using AVC.Wpf.PubSubMessages;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
@@ -32,8 +32,8 @@ namespace AVC.Wpf.Services
 
         private readonly IAudioController _audioController;
 
-        //private readonly IMvxMessenger _messenger;
         private readonly ILogger<AudioService> _logger;
+        private bool _suppressMessage;
 
         public AudioService(IAudioController audioController,
                             ILogger<AudioService> logger)
@@ -60,11 +60,17 @@ namespace AVC.Wpf.Services
 
                 // update the model (and somehow tell the viewModel)
                 device.VolumeChanged.When(vc => {
-                    _logger.LogInformation($"Device volume changed. {vc.Device.Volume}");
+                    _logger.LogTrace("Device volume changed: {volume:D}", vc.Device.Volume);
 
-                    deviceModel.Volume = (int) vc.Device.Volume;
-                    AudioServiceDeviceVolumeUpdate message = new(deviceModel.Volume);
-                    PubSub.Publish(message);
+                    if (!_suppressMessage) {
+                        deviceModel.Volume = (int) vc.Device.Volume;
+                        AudioServiceDeviceVolumeUpdate message = new(deviceModel.Volume);
+                        PubSub.Publish(message);
+                    } else {
+                        _logger.LogTrace("Message suppressed: {type}", nameof(AudioServiceDeviceVolumeUpdate));
+                    }
+
+                    _suppressMessage = false;
 
                     return true;
                 });
@@ -125,6 +131,8 @@ namespace AVC.Wpf.Services
 
         public void SetDeviceVolume(Guid id, int value)
         {
+            _suppressMessage = true;
+
             _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 

@@ -1,43 +1,70 @@
 ﻿using System.Windows;
+using AudioSwitcher.AudioApi;
+using AudioSwitcher.AudioApi.CoreAudio;
+using AVC.Wpf.MVVM.Views;
 using AVC.Wpf.Services;
+using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Prism.DryIoc;
+using Prism.Ioc;
+using Serilog;
 
 namespace AVC.Wpf
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : PrismApplication
     {
-        private readonly IServiceScope _scope;
-        private readonly ILogger _logger;
-        private readonly ISerialCommunication _serialComm;
-
-        public App()
+        protected override IContainerExtension CreateContainerExtension()
         {
-            _scope = AppServices.Instance.ServiceProvider.CreateScope();
-            _logger = _scope.ServiceProvider.GetRequiredService<ILogger<App>>();
-            _logger.LogInformation($"{nameof(App)}()");
-            _serialComm = _scope.ServiceProvider.GetRequiredService<ISerialCommunication>();
+            // https://www.andicode.com/prism/wpf/logging/2021/05/21/Logging-In-Prism.html
+
+            // Configure Serilog and the sinks at the startup of the app
+            Log.Logger = new LoggerConfiguration()
+                         .MinimumLevel.Verbose()
+                         .Enrich.FromLogContext()
+                         .WriteTo.Debug()
+                         .CreateLogger();
+
+            Log.Verbose("{Class}.{Function}()", nameof(App), nameof(CreateContainerExtension));
+            ServiceCollection serviceCollection = new();
+            serviceCollection.AddLogging(loggingBuilder =>
+                                             loggingBuilder.AddSerilog(dispose: true));
+
+            return new DryIocContainerExtension(new Container(CreateContainerRules()).WithDependencyInjectionAdapter(serviceCollection));
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            Log.Verbose("{Class}.{Function}()", nameof(App), nameof(RegisterTypes));
+
+            containerRegistry.RegisterSingleton<IAudioController, CoreAudioController>();
+            containerRegistry.RegisterSingleton<IAudioService, AudioService>();
+            containerRegistry.RegisterSingleton<ISerialCommunication, SerialCommunication>();
+        }
+
+        protected override Window CreateShell()
+        {
+            Log.Verbose("{Class}.{Function}()", nameof(App), nameof(CreateShell));
+
+            return Container.Resolve<MainWindow>();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            _logger.LogInformation($"{nameof(App)}.{nameof(OnStartup)}()");
 
-            MainWindow window = _scope.ServiceProvider.GetRequiredService<MainWindow>();
-            window.Show();
+            Log.Verbose("{Class}.{Function}()", nameof(App), nameof(OnStartup));
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _logger.LogInformation($"{nameof(App)}.{nameof(OnExit)}()");
-            _logger.LogInformation("Disposing scope");
-            _scope.Dispose();
-            _logger.LogInformation("Disposing ServiceProvider");
-            AppServices.Instance.Dispose();
+            Log.Verbose("{Class}.{Function}()", nameof(App), nameof(OnExit));
+
+            Container.GetContainer().Dispose();
+
             base.OnExit(e);
         }
     }
