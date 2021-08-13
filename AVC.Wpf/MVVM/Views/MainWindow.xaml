@@ -65,12 +65,24 @@
         <ListBox x:Name="AppSelectionComboBox1"
                  Margin="0 0 20 0"
                  SelectedValue="{Binding AppSelectionComboBox1SelectedValue, Mode=TwoWay}"
-                 ItemsSource="{Binding AudioSessions, Mode=TwoWay}"
-                 DisplayMemberPath="DisplayName"
+                 ItemsSource="{Binding AudioSessions, Mode=OneWay}"
                  SelectedValuePath="Id"
                  Height="100"
                  Width="200"
-                 ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                 ScrollViewer.VerticalScrollBarVisibility="Visible">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal">
+                <!--<Image Source="{Binding IconPath}" Height="30"></Image>-->
+                <!--<TextBlock Text="TODo: ShowIcon "></TextBlock>-->
+                <TextBlock Text="{Binding DisplayName}"
+                           Background="Chartreuse" />
+                <TextBlock Text="{Binding State}"
+                           Background="Chartreuse" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
         <Slider x:Name="AppVolumeSlider1"
                 Value="{Binding AppVolumeSlider1Value, Mode=TwoWay}"
                 Width="200"

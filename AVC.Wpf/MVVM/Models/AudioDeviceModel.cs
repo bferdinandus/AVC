@@ -4,7 +4,7 @@ namespace AVC.Wpf.MVVM.Models
 {
     public class AudioDeviceModel
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string FullName { get; set; }
         public bool Muted { get; set; }
         public int Volume { get; set; }

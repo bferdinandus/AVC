@@ -1,4 +1,4 @@
-﻿using AudioSwitcher.AudioApi.Session;
+﻿using CoreAudio;
 
 namespace AVC.Wpf.MVVM.Models
 {
@@ -13,7 +13,7 @@ namespace AVC.Wpf.MVVM.Models
 
         public string Id { get; set; }
         public string IconPath { get; set; }
-        public int ProcessId { get; set; }
+        public uint ProcessId { get; set; }
         public AudioSessionState State { get; set; }
         public bool Muted { get; set; }
         public int Volume { get; set; }

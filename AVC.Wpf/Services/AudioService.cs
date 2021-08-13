@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.Observables;
-using AudioSwitcher.AudioApi.Session;
 using AVC.Wpf.MVVM.Models;
 using AVC.Wpf.PubSubMessages;
+using CoreAudio;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using PubSubNET;
@@ -15,29 +13,26 @@ namespace AVC.Wpf.Services
     public interface IAudioService
     {
         List<AudioDeviceModel> GetActiveOutputDevices();
-        List<AudioSessionModel> GetAudioSessionsForCurrentDevice();
-        List<AudioSessionModel> GetAudioSessionsForDevice(Guid id);
-        void SelectDeviceById(Guid id);
-        int GetDeviceVolume(Guid id);
-        int GetAudioSessionVolume(string id);
+        List<AudioSessionModel> GetAudioSessionsForDevice(string id);
+        void SelectDeviceById(string id);
     }
 
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
     public class AudioService : IAudioService, IDisposable
     {
+        private readonly MMDeviceEnumerator _deviceEnumerator;
+        private readonly ILogger<AudioService> _logger;
+
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
 
-        private readonly IAudioController _audioController;
-
-        private readonly ILogger<AudioService> _logger;
         private bool _doSendMessage = true;
 
-        public AudioService(IAudioController audioController,
+        public AudioService(MMDeviceEnumerator deviceEnumerator,
                             ILogger<AudioService> logger)
         {
+            _deviceEnumerator = deviceEnumerator;
             _logger = logger;
-            _audioController = audioController;
 
             PubSub.Subscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
             PubSub.Subscribe<AudioService, MainWindowDeviceVolumeUpdate>(this, OnMainWindowDeviceVolumeUpdate);
@@ -45,30 +40,35 @@ namespace AVC.Wpf.Services
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
         {
-            IEnumerable<IDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
+            MMDeviceCollection devices = _deviceEnumerator.EnumerateAudioEndPoints(EDataFlow.eRender, DEVICE_STATE.DEVICE_STATE_ACTIVE);
 
-            foreach (IDevice device in devices) {
+            foreach (MMDevice device in devices) {
                 AudioDeviceModel deviceModel = new() {
-                    Id = device.Id,
-                    FullName = device.Name,
-                    Selected = device.IsDefaultDevice,
-                    Volume = (int) device.Volume,
-                    Muted = device.IsMuted,
-                    IconPath = device.IconPath
+                    Id = device.ID,
+                    Selected = device.Selected,
+                    Volume = (int) (device.AudioEndpointVolume.MasterVolumeLevelScalar * 100),
+                    Muted = device.AudioEndpointVolume.Mute,
+                    IconPath = "",
+                    FullName = device.Properties.Contains(PKEY.PKEY_Device_DeviceDesc)
+                        ? (string) device.Properties[PKEY.PKEY_Device_DeviceDesc].Value
+                        : device.FriendlyName
                 };
 
-                // update the model (and somehow tell the viewModel)
-                device.VolumeChanged.When(vc => {
-                    _logger.LogTrace("Device volume changed: {volume}", (int) vc.Device.Volume);
+                // for (int i = 0; i < device.Properties.Count; i++) {
+                //     PropertyStoreProperty x = device.Properties[i];
+                //     _logger.LogInformation("Property {p1}, {p2} Value {v}", x.Key.fmtid, x.Key.pid, x.Value);
+                // }
 
-                    if (_doSendMessage) {
-                        PubSub.Publish(new AudioServiceDeviceVolumeUpdate((int) vc.Device.Volume));
-                    }
-
-                    _doSendMessage = true;
-
-                    return true;
-                });
+                // device.AudioEndpointVolume.OnVolumeNotification += delegate(AudioVolumeNotificationData data) {
+                //     int newVolume = (int) (data.MasterVolume * 100);
+                //     _logger.LogTrace("Device volume changed: {volume}", newVolume);
+                //
+                //     if (_doSendMessage) {
+                //         PubSub.Publish(new AudioServiceDeviceVolumeUpdate(newVolume));
+                //     }
+                //
+                //     _doSendMessage = true;
+                // };
 
                 _outputDevices.Add(deviceModel);
             }
@@ -76,35 +76,31 @@ namespace AVC.Wpf.Services
             return _outputDevices;
         }
 
-        public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
-        {
-            return GetAudioSessionsForDevice(_outputDevices.Single(m => m.Selected).Id);
-        }
-
-        public List<AudioSessionModel> GetAudioSessionsForDevice(Guid id)
+        public List<AudioSessionModel> GetAudioSessionsForDevice(string id)
         {
             _audioSessions.Clear();
 
-            IDevice audioDevice = _audioController.GetDevice(id);
-            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
+            MMDevice device = _deviceEnumerator.GetDevice(id);
+            device.AudioSessionManager2.RefreshSessions();
+            SessionCollection sessions = device.AudioSessionManager2.Sessions;
 
-            foreach (IAudioSession session in sessions) {
+            foreach (AudioSessionControl2 session in sessions) {
                 AudioSessionModel sessionModel = new() {
-                    Id = session.Id,
+                    Id = session.GetSessionIdentifier,
                     DisplayName = session.DisplayName,
                     IconPath = session.IconPath,
-                    State = session.SessionState,
-                    ProcessId = session.ProcessId,
-                    IsSystemSoundsSession = session.IsSystemSession,
-                    Volume = (int) session.Volume,
-                    Muted = session.IsMuted
+                    State = session.State,
+                    ProcessId = session.GetProcessID,
+                    IsSystemSoundsSession = session.IsSystemSoundsSession,
+                    Volume = (int) (session.SimpleAudioVolume.MasterVolume * 100),
+                    Muted = session.SimpleAudioVolume.Mute
                 };
 
                 // update the model (and somehow tell the viewModel)
-                session.VolumeChanged.When(vc => {
-                    sessionModel.Volume = (int) vc.Session.Volume;
-                    return true;
-                });
+                // session.OnSimpleVolumeChanged += delegate(object sender, float volume, bool mute) {
+                //     sessionModel.Volume = (int) volume * 100;
+                //     sessionModel.Muted = mute;
+                // };
 
                 _audioSessions.Add(sessionModel);
             }
@@ -112,7 +108,7 @@ namespace AVC.Wpf.Services
             return _audioSessions;
         }
 
-        public void SelectDeviceById(Guid id)
+        public void SelectDeviceById(string id)
         {
             // mark all local models as not selected
             _outputDevices.ForEach(m => m.Selected = false);
@@ -121,30 +117,13 @@ namespace AVC.Wpf.Services
             _outputDevices.Single(m => m.Id == id).Selected = true;
 
             // select the output device
-            _audioController.GetDevice(id).SetAsDefault();
+            _deviceEnumerator.GetDevice(id).Selected = true;
         }
 
-        public int GetDeviceVolume(Guid id)
-        {
-            return _outputDevices.Single(m => m.Id == id).Volume;
-        }
-
-        public int GetAudioSessionVolume(string id)
-        {
-            return _audioSessions.Single(m => m.Id == id).Volume;
-        }
-
-        private void SetSessionVolume(string id, int value)
-        {
-            IDevice audioDevice = _audioController.GetDevice(_outputDevices.Single(m => m.Selected).Id);
-            IAudioSession session = audioDevice.GetCapability<IAudioSessionController>().All().Single(s => s.Id == id);
-            session.SetVolumeAsync(value);
-        }
-
-        private void SetDeviceVolume(Guid id, int value)
+        private void SetDeviceVolume(string id, int value)
         {
             _doSendMessage = false;
-            _audioController.GetDevice(id).SetVolumeAsync(value);
+            _deviceEnumerator.GetDevice(id).AudioEndpointVolume.MasterVolumeLevelScalar = value / 100F;
         }
 
         private void OnArduinoDeviceVolumeUpdate(ArduinoServiceDeviceVolumeUpdate obj)

@@ -1,8 +1,7 @@
 ﻿using System.Windows;
-using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.CoreAudio;
 using AVC.Wpf.MVVM.Views;
 using AVC.Wpf.Services;
+using CoreAudio;
 using Microsoft.Extensions.DependencyInjection;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -41,7 +40,7 @@ namespace AVC.Wpf
         {
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(RegisterTypes));
 
-            containerRegistry.RegisterSingleton<IAudioController, CoreAudioController>();
+            containerRegistry.RegisterSingleton<MMDeviceEnumerator>();
             containerRegistry.RegisterSingleton<IAudioService, AudioService>();
             containerRegistry.RegisterSingleton<IArduinoService, ArduinoService>();
         }

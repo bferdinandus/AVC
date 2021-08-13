@@ -17,8 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AudioSwitcher\AudioSwitcher.AudioApi.CoreAudio\AudioSwitcher.AudioApi.CoreAudio.csproj" />
-        <ProjectReference Include="..\AudioSwitcher\AudioSwitcher.AudioApi\AudioSwitcher.AudioApi.csproj" />
+        <ProjectReference Include="..\CoreAudio\CoreAudio\CoreAudio.csproj" />
     </ItemGroup>
 
 </Project>
