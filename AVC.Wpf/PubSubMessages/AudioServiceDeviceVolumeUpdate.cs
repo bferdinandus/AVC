@@ -2,6 +2,11 @@
 {
     public class AudioServiceDeviceVolumeUpdate : BaseVolumeUpdate
     {
-        public AudioServiceDeviceVolumeUpdate(int volume) : base(volume) {}
+        public string Name { get; }
+
+        public AudioServiceDeviceVolumeUpdate(int volume, string name) : base(volume)
+        {
+            Name = name;
+        }
     }
 }

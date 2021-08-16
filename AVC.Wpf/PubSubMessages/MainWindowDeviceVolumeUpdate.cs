@@ -2,6 +2,11 @@
 {
     public class MainWindowDeviceVolumeUpdate : BaseVolumeUpdate
     {
-        public MainWindowDeviceVolumeUpdate(int volume) : base(volume) {}
+        public string Name { get; }
+
+        public MainWindowDeviceVolumeUpdate(int volume, string name) : base(volume)
+        {
+            Name = name;
+        }
     }
 }

@@ -21,8 +21,8 @@ namespace AVC.Wpf.MVVM.ViewModels
         /*
          * AutoProperties
          */
-        public ObservableCollection<AudioDeviceModel> AudioDevices { get; set; } = new();
-        public ObservableCollection<AudioSessionModel> AudioSessions { get; set; } = new();
+        public ObservableCollection<AudioDeviceModel> AudioDevices { get; } = new();
+        public ObservableCollection<AudioSessionModel> AudioSessions { get; } = new();
 
         /*
          * Full properties
@@ -65,9 +65,11 @@ namespace AVC.Wpf.MVVM.ViewModels
             _logger.LogTrace("{Class}()", nameof(MainWindowViewModel));
             _audioService = audioService;
 
-            AudioDevices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
+            AudioDevices.AddRange(_audioService.GetActiveOutputDevices());
             DeviceSelectionComboBoxSelectedValue = AudioDevices.Single(a => a.Selected).Id;
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
+
+            AudioSessions.AddRange(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
 
             PubSub.Subscribe<MainWindowViewModel, AudioServiceDeviceVolumeUpdate>(this, OnAudioServiceDeviceVolumeUpdate);
             PubSub.Subscribe<MainWindowViewModel, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
@@ -87,10 +89,10 @@ namespace AVC.Wpf.MVVM.ViewModels
             _logger.LogTrace("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnDeviceSelectionComboBoxSelectionChanged));
             _audioService.SelectDeviceById(DeviceSelectionComboBoxSelectedValue);
 
-            _doSendMessage = false;
             DeviceVolumeSliderValue = AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).Volume;
 
-            AudioSessions = new ObservableCollection<AudioSessionModel>(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
+            AudioSessions.Clear();
+            AudioSessions.AddRange(_audioService.GetAudioSessionsForDevice(DeviceSelectionComboBoxSelectedValue));
         }
 
         private DelegateCommand _deviceVolumeSliderValueChangedCommand;
@@ -101,7 +103,7 @@ namespace AVC.Wpf.MVVM.ViewModels
         {
             _logger.LogDebug("{Class}.{Function}()", nameof(MainWindowViewModel), nameof(OnDeviceVolumeSliderValueChanged));
             if (_doSendMessage) {
-                PubSub.Publish(new MainWindowDeviceVolumeUpdate(DeviceVolumeSliderValue));
+                PubSub.Publish(new MainWindowDeviceVolumeUpdate(DeviceVolumeSliderValue, AudioDevices.Single(a => a.Id == DeviceSelectionComboBoxSelectedValue).FullName));
             }
 
             _doSendMessage = true;

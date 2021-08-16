@@ -69,7 +69,7 @@ namespace AVC.Wpf.Services
                 _serialPort.WriteLine("<0,Master,10>");
             }
 
-            Regex arduinoCommandPattern = new Regex("(\\d),(\\w+?),(\\d+)");
+            Regex arduinoCommandPattern = new Regex(@"(\d),([\w,\s]+),(\d+)");
             Match commandMatch = arduinoCommandPattern.Match(obj.Message);
             if (commandMatch.Success) {
                 PubSub.Publish(new ArduinoServiceDeviceVolumeUpdate(int.Parse(commandMatch.Groups[3].Value)));
@@ -80,7 +80,7 @@ namespace AVC.Wpf.Services
         {
             _logger.LogDebug("{Class}.{Function}()", nameof(ArduinoService), nameof(OnAudioServiceDeviceVolumeUpdate));
 
-            string arduinoInfo = $"<0,Master,{obj.Volume}>";
+            string arduinoInfo = $"<0,{obj.Name.Substring(0, Math.Min(9, obj.Name.Length))},{obj.Volume}>";
             _logger.LogDebug("{Class} Sending info to arduino: {0}", nameof(ArduinoService), arduinoInfo);
 
             _serialPort.WriteLine(arduinoInfo);
@@ -90,7 +90,7 @@ namespace AVC.Wpf.Services
         {
             _logger.LogDebug("{Class}.{Function}()", nameof(ArduinoService), nameof(OnMainWindowDeviceVolumeUpdate));
 
-            string arduinoInfo = $"<0,Master,{obj.Volume}>";
+            string arduinoInfo = $"<0,{obj.Name.Substring(0, Math.Min(9, obj.Name.Length))},{obj.Volume}>";
             _logger.LogDebug("{Class} Sending info to arduino: {0}", nameof(ArduinoService), arduinoInfo);
 
             _serialPort.WriteLine(arduinoInfo);

@@ -62,7 +62,7 @@ namespace AVC.Wpf.Services
                     _logger.LogTrace("Device volume changed: {volume}", (int) vc.Device.Volume);
 
                     if (_doSendMessage) {
-                        PubSub.Publish(new AudioServiceDeviceVolumeUpdate((int) vc.Device.Volume));
+                        PubSub.Publish(new AudioServiceDeviceVolumeUpdate((int) vc.Device.Volume, vc.Device.Name));
                     }
 
                     _doSendMessage = true;
@@ -86,7 +86,7 @@ namespace AVC.Wpf.Services
             _audioSessions.Clear();
 
             IDevice audioDevice = _audioController.GetDevice(id);
-            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
+            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().AllAsync().Result;
 
             foreach (IAudioSession session in sessions) {
                 AudioSessionModel sessionModel = new() {
@@ -121,7 +121,13 @@ namespace AVC.Wpf.Services
             _outputDevices.Single(m => m.Id == id).Selected = true;
 
             // select the output device
-            _audioController.GetDevice(id).SetAsDefault();
+            IDevice device = _audioController.GetDevice(id);
+            device.SetAsDefault();
+            IEnumerable<IDeviceCapability> y = device.GetAllCapabilities();
+
+            foreach (IDeviceCapability deviceCapability in y) {
+                _logger.LogInformation("{0}", deviceCapability.GetType());
+            }
         }
 
         public int GetDeviceVolume(Guid id)

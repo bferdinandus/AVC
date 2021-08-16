@@ -18,6 +18,11 @@ namespace AVC.Wpf
         private IArduinoService _arduinoService;
         private IAudioService _audioService;
 
+        public App()
+        {
+
+        }
+
         protected override IContainerExtension CreateContainerExtension()
         {
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(CreateContainerExtension));
@@ -26,7 +31,7 @@ namespace AVC.Wpf
             containerExtension.RegisterServices(services => {
                 // Configure Serilog and the sinks at the startup of the app
                 Log.Logger = new LoggerConfiguration()
-                             .MinimumLevel.Debug()
+                             .MinimumLevel.Verbose()
                              .Enrich.FromLogContext()
                              .WriteTo.Debug()
                              .CreateLogger();
