@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSwitcher.AudioApi.Core
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.Wpf", "AVC.Wpf\AVC.Wpf.csproj", "{5861534A-4E42-44CF-83C3-A5907840FE8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.Core", "AVC.Core\AVC.Core.csproj", "{36F9B8CE-7071-4A79-BA79-588B5F0F031B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVC.UI", "AVC.UI\AVC.UI.csproj", "{329DEC62-1E59-4B20-A867-365BA5F130A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +28,14 @@ Global
 		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5861534A-4E42-44CF-83C3-A5907840FE8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F9B8CE-7071-4A79-BA79-588B5F0F031B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F9B8CE-7071-4A79-BA79-588B5F0F031B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F9B8CE-7071-4A79-BA79-588B5F0F031B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F9B8CE-7071-4A79-BA79-588B5F0F031B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{329DEC62-1E59-4B20-A867-365BA5F130A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{329DEC62-1E59-4B20-A867-365BA5F130A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{329DEC62-1E59-4B20-A867-365BA5F130A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{329DEC62-1E59-4B20-A867-365BA5F130A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

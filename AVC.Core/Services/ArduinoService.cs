@@ -2,11 +2,11 @@
 using System.IO.Ports;
 using System.Text;
 using System.Text.RegularExpressions;
-using AVC.Wpf.PubSubMessages;
+using AVC.Core.PubSubMessages;
 using Microsoft.Extensions.Logging;
 using PubSubNET;
 
-namespace AVC.Wpf.Services
+namespace AVC.Core.Services
 {
     public interface IArduinoService {}
 

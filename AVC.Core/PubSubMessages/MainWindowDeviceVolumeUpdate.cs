@@ -1,4 +1,4 @@
-﻿namespace AVC.Wpf.PubSubMessages
+﻿namespace AVC.Core.PubSubMessages
 {
     public class MainWindowDeviceVolumeUpdate : BaseVolumeUpdate
     {

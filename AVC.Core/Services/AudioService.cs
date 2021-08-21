@@ -4,13 +4,13 @@ using System.Linq;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
 using AudioSwitcher.AudioApi.Session;
-using AVC.Wpf.MVVM.Models;
-using AVC.Wpf.PubSubMessages;
+using AVC.Core.Models;
+using AVC.Core.PubSubMessages;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using PubSubNET;
 
-namespace AVC.Wpf.Services
+namespace AVC.Core.Services
 {
     public interface IAudioService
     {
