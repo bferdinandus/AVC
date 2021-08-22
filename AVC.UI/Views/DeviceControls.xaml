@@ -37,8 +37,7 @@
              SelectedItem="{Binding SelectedDevice}"
              SelectionMode="Single"
              ScrollViewer.VerticalScrollBarVisibility="Visible"
-             Background="Transparent"
-             >
+             Background="Transparent">
       <i:Interaction.Triggers>
         <i:EventTrigger EventName="SelectionChanged">
           <prism:InvokeCommandAction Command="{Binding DeviceSelectedCommand}" />
@@ -51,7 +50,7 @@
             <!--<TextBlock Text="Todo: ShowIcon "></TextBlock>-->
             <TextBlock Text="{Binding FullName}"
                        Background="Transparent"
-                       Foreground="Aquamarine"/>
+                       Foreground="Aquamarine" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
@@ -66,9 +65,20 @@
 
     <Slider Grid.Row="1"
             Grid.Column="1"
+            x:Name="Volume"
             Margin="10 10 10 0"
-            VerticalAlignment="Top">
-
+            VerticalAlignment="Top"
+            Minimum="0"
+            Maximum="100"
+            TickPlacement="Both"
+            TickFrequency="10"
+            LargeChange="10"
+            Value="{Binding DeviceVolume}">
+      <i:Interaction.Triggers>
+        <i:EventTrigger EventName="ValueChanged">
+          <prism:InvokeCommandAction Command="{Binding VolumeChangedCommand}" />
+        </i:EventTrigger>
+      </i:Interaction.Triggers>
     </Slider>
 
   </Grid>

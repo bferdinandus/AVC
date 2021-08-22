@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using AVC.Core.Models;
@@ -19,13 +19,13 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         /*
          * AutoProperties
-         */
+         #1#
         public ObservableCollection<AudioDeviceModel> AudioDevices { get; } = new();
         public ObservableCollection<AudioSessionModel> AudioSessions { get; } = new();
 
         /*
          * Full properties
-         */
+         #1#
         private int _deviceVolumeSliderValue;
 
         public int DeviceVolumeSliderValue {
@@ -56,7 +56,7 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         /*
          * Constructor
-         */
+         #1#
         public OldMainWindowViewModel(IAudioService audioService,
                                       ILogger<OldMainWindowViewModel> logger)
         {
@@ -76,7 +76,7 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         /*
          * Commands
-         */
+         #1#
 
         private DelegateCommand _deviceSelectionComboBoxSelectionChangedCommand;
 
@@ -110,7 +110,7 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         /*
          * Other functions
-         */
+         #1#
 
         private void OnAudioServiceDeviceVolumeUpdate(AudioServiceDeviceVolumeUpdate message)
         {
@@ -138,7 +138,7 @@ namespace AVC.Wpf.MVVM.ViewModels
 
         /*
          * Dispose / destructor
-         */
+         #1#
         public void Dispose()
         {
             _logger.LogDebug("{Class}.{Function}()", nameof(OldMainWindowViewModel), nameof(Dispose));
@@ -147,4 +147,4 @@ namespace AVC.Wpf.MVVM.ViewModels
             PubSub.Unsubscribe<OldMainWindowViewModel, ArduinoServiceDeviceVolumeUpdate>(this);
         }
     }
-}
+}*/
