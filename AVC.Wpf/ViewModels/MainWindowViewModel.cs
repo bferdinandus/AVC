@@ -1,10 +1,7 @@
-﻿using System.Windows.Input;
-using System.Windows;
-using Microsoft.Extensions.Logging;
-using Prism.Commands;
+﻿using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
 
-namespace AVC.Wpf.MVVM.ViewModels
+namespace AVC.Wpf.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {

@@ -1,19 +1,15 @@
-﻿using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
-using AVC.Core;
 using AVC.Core.Services;
 using AVC.UI;
-using AVC.Wpf.MVVM.Views;
+using AVC.Wpf.Views;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Mvvm;
-using Prism.Regions;
 using Serilog;
 
 namespace AVC.Wpf

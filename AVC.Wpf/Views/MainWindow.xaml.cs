@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace AVC.Wpf.MVVM.Views
+namespace AVC.Wpf.Views
 {
     public partial class MainWindow : Window
     {

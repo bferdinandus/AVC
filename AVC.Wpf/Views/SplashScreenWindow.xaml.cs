@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace AVC.Wpf.MVVM.Views
+namespace AVC.Wpf.Views
 {
     public partial class SplashScreenWindow : Window
     {
