@@ -50,8 +50,6 @@ namespace AVC.UI.ViewModels
             _logger = logger;
             _audioService = audioService;
 
-            _logger.LogTrace("{Function}()", nameof(DeviceControlsViewModel));
-
             Devices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
             SelectedDevice = Devices.Single(s => s.Selected);
             DeviceVolume = SelectedDevice.Volume;
@@ -59,7 +57,7 @@ namespace AVC.UI.ViewModels
             DeviceSelectedCommand = new DelegateCommand<SelectionChangedEventArgs>(ChangeOutputDevice);
             VolumeChangedCommand = new DelegateCommand<RoutedPropertyChangedEventArgs<double>>(OnVolumeChanged);
 
-            eventAggregator.GetEvent<DeviceUpdatedEvent>().Subscribe(OnDeviceUpdate);
+            eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdate);
         }
 
         private void OnVolumeChanged(RoutedPropertyChangedEventArgs<double> obj)
@@ -88,7 +86,7 @@ namespace AVC.UI.ViewModels
 
         public void Dispose()
         {
-            _logger.LogDebug("{Function}()", nameof(Dispose));
+            _logger.LogTrace("{Function}()", nameof(Dispose));
         }
     }
 }

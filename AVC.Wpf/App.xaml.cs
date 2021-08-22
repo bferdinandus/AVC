@@ -42,7 +42,7 @@ namespace AVC.Wpf
             //in order to ensure the UI stays responsive, we need to
             //do the work on a different thread
             Task.Factory.StartNew(() => {
-                // _arduinoService = Container.Resolve<IArduinoService>();
+                _arduinoService = Container.Resolve<IArduinoService>();
                 _audioService = Container.Resolve<IAudioService>();
 
                 //since we're not on the UI thread
@@ -70,7 +70,7 @@ namespace AVC.Wpf
                     @"[{Timestamp:HH:mm:ss.fff}] [{Level:u3}] [{SourceContext}] [{RequestId}]{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}";
 
                 Log.Logger = new LoggerConfiguration()
-                             .MinimumLevel.Verbose()
+                             .MinimumLevel.Debug()
                              .Enrich.FromLogContext()
 
                              //.Enrich.WithMachineName()
@@ -91,8 +91,7 @@ namespace AVC.Wpf
 
             containerRegistry.RegisterSingleton<IAudioController, CoreAudioController>();
             containerRegistry.RegisterSingleton<IAudioService, AudioService>();
-
-            // containerRegistry.RegisterSingleton<IArduinoService, ArduinoService>();
+            containerRegistry.RegisterSingleton<IArduinoService, ArduinoService>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

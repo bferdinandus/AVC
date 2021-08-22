@@ -44,8 +44,8 @@ namespace AVC.Core.Services
             _audioController = audioController;
             _eventAggregator = eventAggregator;
 
-            // PubSub.Subscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
             //_eventAggregator.GetEvent<UiVolumeChangedEvent>().Subscribe(OnUiVolumeChanged);
+            _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdate);
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
@@ -68,10 +68,8 @@ namespace AVC.Core.Services
                         return false;
                     }
 
-                    _logger.LogTrace("Device volume changed: {volume}", (int) vc.Device.Volume);
-
                     deviceModel.Volume = (int) vc.Device.Volume;
-                    _eventAggregator.GetEvent<DeviceUpdatedEvent>().Publish(new DeviceUpdateMessage { DeviceName = vc.Device.Name, Volume = (int) vc.Device.Volume });
+                    _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = vc.Device.Name, Volume = deviceModel.Volume });
 
                     return true;
                 });
@@ -93,11 +91,6 @@ namespace AVC.Core.Services
             // select the output device
             IDevice device = _audioController.GetDevice(id);
             device.SetAsDefault();
-            IEnumerable<IDeviceCapability> y = device.GetAllCapabilities();
-
-            foreach (IDeviceCapability deviceCapability in y) {
-                _logger.LogInformation("{0}", deviceCapability.GetType());
-            }
         }
 
         public void SetDeviceVolume(Guid id, int value)
@@ -105,23 +98,22 @@ namespace AVC.Core.Services
             _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
-        // private void OnArduinoDeviceVolumeUpdate(ArduinoServiceDeviceVolumeUpdate obj)
-        // {
-        //     _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnArduinoDeviceVolumeUpdate));
-        //
-        //     SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
-        // }
-        //
-        // private void OnMainWindowDeviceVolumeUpdate(MainWindowDeviceVolumeUpdate obj)
-        // {
-        //     _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnMainWindowDeviceVolumeUpdate));
-        //
-        //     SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
-        // }
+        private void OnArduinoDeviceUpdate(ArduinoDeviceUpdateMessage message)
+        {
+            switch (message.Channel) {
+                case 0: // device (master) channel
+                    SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, message.Volume);
+                    break;
+                case 1: // audion session channel 1
+                    break;
+                case 2: // audio session channel 2
+                    break;
+            }
+        }
 
         public void Dispose()
         {
-            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(Dispose));
+            _logger.LogTrace("{Function}()", nameof(Dispose));
         }
 
         /*

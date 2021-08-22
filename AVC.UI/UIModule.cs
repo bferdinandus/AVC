@@ -18,17 +18,17 @@ namespace AVC.UI
             _regionManager = regionManager;
             _logger = logger;
 
-            _logger.LogTrace("{Class}()", nameof(UiModule));
+            _logger.LogTrace("{Function}()", nameof(UiModule));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            _logger.LogTrace("{Class}.{Function}()", nameof(UiModule), nameof(RegisterTypes));
+            _logger.LogTrace("{Function}()", nameof(RegisterTypes));
         }
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            _logger.LogTrace("{Class}.{Function}()", nameof(UiModule), nameof(OnInitialized));
+            _logger.LogTrace("{Function}()", nameof(OnInitialized));
 
             _regionManager.RegisterViewWithRegion(RegionNames.DeviceControls, typeof(DeviceControls));
         }
