@@ -31,7 +31,7 @@
 
     <ListBox Grid.Column="0"
              Grid.Row="1"
-             x:Name="DeviceSelectionListBox"
+             x:Name="DevicesListBox"
              Margin="10 10 10 10"
              ItemsSource="{Binding Devices, Mode=OneWay}"
              SelectedItem="{Binding SelectedDevice}"
@@ -40,7 +40,7 @@
              Background="Transparent">
       <i:Interaction.Triggers>
         <i:EventTrigger EventName="SelectionChanged">
-          <prism:InvokeCommandAction Command="{Binding DeviceSelectedCommand}" />
+          <prism:InvokeCommandAction Command="{Binding DeviceSelectionChangedCommand}" />
         </i:EventTrigger>
       </i:Interaction.Triggers>
       <ListBox.ItemTemplate>

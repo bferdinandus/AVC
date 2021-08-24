@@ -11,22 +11,27 @@ namespace AVC.Core.Services
 
     public sealed class ArduinoService : IArduinoService, IDisposable
     {
+        // services
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<ArduinoService> _logger;
 
-        private readonly SerialPort _serialPort;
+        // private variables
         private readonly StringBuilder _incomingData = new();
+        private long _lastDeviceUpdateEventSent = DateTime.Now.Ticks;
+        private readonly SerialPort _serialPort;
+        private bool _arduinoReady;
 
-        private bool _arduinoReady = false;
-
+        /*
+         * constructor
+         */
         public ArduinoService(IEventAggregator eventAggregator,
                               ILogger<ArduinoService> logger)
         {
             _eventAggregator = eventAggregator;
             _logger = logger;
 
-            _eventAggregator.GetEvent<ArduinoMessageEvent>().Subscribe(OnArduinoMessage);
-            _eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdate);
+            _eventAggregator.GetEvent<ArduinoMessageEvent>().Subscribe(OnArduinoMessageEvent);
+            _eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
 
             _serialPort = new SerialPort();
             _serialPort.PortName = "COM4";
@@ -60,7 +65,7 @@ namespace AVC.Core.Services
             }
         }
 
-        private void OnArduinoMessage(string message)
+        private void OnArduinoMessageEvent(string message)
         {
             string[] messageParts = message.Split(':');
 
@@ -78,6 +83,7 @@ namespace AVC.Core.Services
                     break;
                 case ArduinoCommands.Vol:
                     // 0:cmd 1:vol 2:(index) 3:(volume)
+                    _lastDeviceUpdateEventSent = DateTime.Now.Ticks;
                     _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>()
                                     .Publish(new ArduinoDeviceUpdateMessage { Channel = int.Parse(messageParts[2]), Volume = int.Parse(messageParts[3]) });
                     break;
@@ -89,55 +95,24 @@ namespace AVC.Core.Services
             }
         }
 
-        private void OnDeviceUpdate(DeviceUpdateMessage message)
+        private void OnDeviceUpdateEvent(DeviceUpdateMessage message)
         {
+            if ((DateTime.Now.Ticks - _lastDeviceUpdateEventSent) / TimeSpan.TicksPerMillisecond < 50) {
+                // block incoming device updated x milliseconds after the last ArduinoDeviceUpdateEvent publish
+                _logger.LogDebug("Blocked {0}", nameof(DeviceUpdateEvent));
+
+                return;
+            }
+
             // device is on channel 0 of the arduino
             string arduinoInfo = $"<0,{message.DeviceName[..Math.Min(9, message.DeviceName.Length)].Trim()},{message.Volume}>";
+            _logger.LogDebug("message:{message}", arduinoInfo);
             _serialPort.WriteLine(arduinoInfo);
         }
-
-        // private void OnArduinoMessageReceived(ArduinoMessage obj)
-        // {
-        //     _logger.LogDebug("{Class}.{Function}()", nameof(ArduinoService), nameof(OnArduinoMessageReceived));
-        //     _logger.LogTrace("{Class} Message: {0}", nameof(ArduinoService), obj.Message);
-        //     if (obj.Message == "Arduino is ready") {
-        //         _serialPort.WriteLine("<0,Master,10>");
-        //     }
-        //
-        //     Regex arduinoCommandPattern = new Regex(@"(\d),([\w,\s]+),(\d+)");
-        //     Match commandMatch = arduinoCommandPattern.Match(obj.Message);
-        //     if (commandMatch.Success) {
-        //         PubSub.Publish(new ArduinoServiceDeviceVolumeUpdate(int.Parse(commandMatch.Groups[3].Value)));
-        //     }
-        // }
-        //
-        // private void OnAudioServiceDeviceVolumeUpdate(AudioServiceDeviceVolumeUpdate obj)
-        // {
-        //     _logger.LogDebug("{Class}.{Function}()", nameof(ArduinoService), nameof(OnAudioServiceDeviceVolumeUpdate));
-        //
-        //     string arduinoInfo = $"<0,{obj.Name.Substring(0, Math.Min(9, obj.Name.Length))},{obj.Volume}>";
-        //     _logger.LogDebug("{Class} Sending info to arduino: {0}", nameof(ArduinoService), arduinoInfo);
-        //
-        //     _serialPort.WriteLine(arduinoInfo);
-        // }
-        //
-        // private void OnMainWindowDeviceVolumeUpdate(MainWindowDeviceVolumeUpdate obj)
-        // {
-        //     _logger.LogDebug("{Class}.{Function}()", nameof(ArduinoService), nameof(OnMainWindowDeviceVolumeUpdate));
-        //
-        //     string arduinoInfo = $"<0,{obj.Name.Substring(0, Math.Min(9, obj.Name.Length))},{obj.Volume}>";
-        //     _logger.LogDebug("{Class} Sending info to arduino: {0}", nameof(ArduinoService), arduinoInfo);
-        //
-        //     _serialPort.WriteLine(arduinoInfo);
-        // }
 
         public void Dispose()
         {
             _logger.LogTrace("{Function}()", nameof(Dispose));
-
-            // PubSub.Unsubscribe<ArduinoService, ArduinoMessage>(this);
-            // PubSub.Unsubscribe<ArduinoService, AudioServiceDeviceVolumeUpdate>(this);
-            // PubSub.Unsubscribe<ArduinoService, MainWindowDeviceVolumeUpdate>(this);
 
             _serialPort.DataReceived -= DataReceivedHandler;
             _serialPort.Close();

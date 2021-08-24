@@ -11,31 +11,21 @@ using Prism.Events;
 
 namespace AVC.Core.Services
 {
-    public interface IAudioService
-    {
-        List<AudioDeviceModel> GetActiveOutputDevices();
-
-        void SelectDeviceById(Guid id);
-
-        public void SetDeviceVolume(Guid id, int value);
-
-        // List<AudioSessionModel> GetAudioSessionsForDevice(Guid id);
-        // List<AudioSessionModel> GetAudioSessionsForCurrentDevice();
-        // int GetDeviceVolume(Guid id);
-        // int GetAudioSessionVolume(string id);
-    }
-
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
     public class AudioService : IAudioService, IDisposable
     {
+        // services
+        private readonly IAudioController _audioController;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly ILogger<AudioService> _logger;
+
+        //private variables
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
 
-        private readonly IAudioController _audioController;
-        private readonly IEventAggregator _eventAggregator;
-
-        private readonly ILogger<AudioService> _logger;
-
+        /*
+         * constructor
+         */
         public AudioService(IAudioController audioController,
                             IEventAggregator eventAggregator,
                             ILogger<AudioService> logger)
@@ -44,8 +34,8 @@ namespace AVC.Core.Services
             _audioController = audioController;
             _eventAggregator = eventAggregator;
 
-            //_eventAggregator.GetEvent<UiVolumeChangedEvent>().Subscribe(OnUiVolumeChanged);
-            _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdate);
+            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
+            _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
@@ -67,6 +57,8 @@ namespace AVC.Core.Services
                     if (deviceModel.Volume == (int) vc.Device.Volume) {
                         return false;
                     }
+
+                    _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, (int) vc.Device.Volume);
 
                     deviceModel.Volume = (int) vc.Device.Volume;
                     _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = vc.Device.Name, Volume = deviceModel.Volume });
@@ -93,12 +85,12 @@ namespace AVC.Core.Services
             device.SetAsDefault();
         }
 
-        public void SetDeviceVolume(Guid id, int value)
+        private void SetDeviceVolume(Guid id, int value)
         {
             _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
-        private void OnArduinoDeviceUpdate(ArduinoDeviceUpdateMessage message)
+        private void OnArduinoDeviceUpdateEvent(ArduinoDeviceUpdateMessage message)
         {
             switch (message.Channel) {
                 case 0: // device (master) channel
@@ -109,6 +101,11 @@ namespace AVC.Core.Services
                 case 2: // audio session channel 2
                     break;
             }
+        }
+
+        private void OnUIDeviceUpdateEvent(UIDeviceUpdateMessage message)
+        {
+            SetDeviceVolume(message.Id, message.Volume);
         }
 
         public void Dispose()
