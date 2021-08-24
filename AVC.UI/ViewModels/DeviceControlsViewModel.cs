@@ -23,7 +23,7 @@ namespace AVC.UI.ViewModels
         private readonly IEventAggregator _eventAggregator;
 
         // private variables
-        private long _lastDeviceUpdateEventSent = DateTime.Now.Ticks;
+        private long _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
 
         // UI properties
         private readonly ObservableCollection<AudioDeviceModel> _devices;
@@ -70,6 +70,20 @@ namespace AVC.UI.ViewModels
             eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
         }
 
+        private void OnVolumeChangedCommand(RoutedPropertyChangedEventArgs<double> obj)
+        {
+            if ((DateTime.Now.Ticks - _lastDeviceUpdateEventReceived) / TimeSpan.TicksPerMillisecond < 50) {
+                // block outgoing event x milliseconds after the last received DeviceUpdateEvent publish
+                _logger.LogDebug("Blocked {0}", nameof(UIDeviceUpdateEvent));
+
+                return;
+            }
+
+            _logger.LogDebug("new volume from slider {0}", obj.NewValue);
+
+            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Publish(new UIDeviceUpdateMessage { Id = SelectedDevice.Id, Volume = (int) obj.NewValue });
+        }
+
         private void OnDeviceSelectionChangedCommand(SelectionChangedEventArgs obj)
         {
             if (obj.AddedItems.Count == 0) {
@@ -84,20 +98,16 @@ namespace AVC.UI.ViewModels
             _audioService.SelectDeviceById(device.Id);
         }
 
-        private void OnVolumeChangedCommand(RoutedPropertyChangedEventArgs<double> obj)
+        private void OnDeviceUpdateEvent(DeviceUpdateMessage message)
         {
-            _logger.LogDebug("new volume {0}", (int) obj.NewValue);
-
-            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Publish(new UIDeviceUpdateMessage { Id = SelectedDevice.Id, Volume = (int) obj.NewValue });
-        }
-
-        private void OnDeviceUpdateEvent(DeviceUpdateMessage deviceUpdateMessage)
-        {
-            if (DeviceVolume == deviceUpdateMessage.Volume) {
+            if (DeviceVolume == message.Volume) {
                 return;
             }
 
-            DeviceVolume = deviceUpdateMessage.Volume;
+            _logger.LogDebug("new volume from device {0}", message.Volume);
+
+            _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
+            DeviceVolume = message.Volume;
         }
 
         public void Dispose()
