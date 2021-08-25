@@ -1,6 +1,6 @@
 ﻿using AudioSwitcher.AudioApi.Session;
 
-namespace AVC.Wpf.MVVM.Models
+namespace AVC.Core.Models
 {
     public class AudioSessionModel
     {

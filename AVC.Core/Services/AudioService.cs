@@ -3,44 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
-using AudioSwitcher.AudioApi.Session;
-using AVC.Wpf.MVVM.Models;
-using AVC.Wpf.PubSubMessages;
+using AVC.Core.Events;
+using AVC.Core.Models;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using PubSubNET;
+using Prism.Events;
 
-namespace AVC.Wpf.Services
+namespace AVC.Core.Services
 {
-    public interface IAudioService
-    {
-        List<AudioDeviceModel> GetActiveOutputDevices();
-        List<AudioSessionModel> GetAudioSessionsForCurrentDevice();
-        List<AudioSessionModel> GetAudioSessionsForDevice(Guid id);
-        void SelectDeviceById(Guid id);
-        int GetDeviceVolume(Guid id);
-        int GetAudioSessionVolume(string id);
-    }
-
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
     public class AudioService : IAudioService, IDisposable
     {
+        // services
+        private readonly IAudioController _audioController;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly ILogger<AudioService> _logger;
+
+        //private variables
         private readonly List<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
 
-        private readonly IAudioController _audioController;
-
-        private readonly ILogger<AudioService> _logger;
-        private bool _doSendMessage = true;
-
+        /*
+         * constructor
+         */
         public AudioService(IAudioController audioController,
+                            IEventAggregator eventAggregator,
                             ILogger<AudioService> logger)
         {
             _logger = logger;
             _audioController = audioController;
+            _eventAggregator = eventAggregator;
 
-            PubSub.Subscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this, OnArduinoDeviceVolumeUpdate);
-            PubSub.Subscribe<AudioService, MainWindowDeviceVolumeUpdate>(this, OnMainWindowDeviceVolumeUpdate);
+            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
+            _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
         }
 
         public List<AudioDeviceModel> GetActiveOutputDevices()
@@ -57,15 +52,16 @@ namespace AVC.Wpf.Services
                     IconPath = device.IconPath
                 };
 
-                // update the model (and somehow tell the viewModel)
+                // update the model and send eventMessage
                 device.VolumeChanged.When(vc => {
-                    _logger.LogTrace("Device volume changed: {volume}", (int) vc.Device.Volume);
-
-                    if (_doSendMessage) {
-                        PubSub.Publish(new AudioServiceDeviceVolumeUpdate((int) vc.Device.Volume));
+                    if (deviceModel.Volume == (int) vc.Device.Volume) {
+                        return false;
                     }
 
-                    _doSendMessage = true;
+                    _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, (int) vc.Device.Volume);
+
+                    deviceModel.Volume = (int) vc.Device.Volume;
+                    _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = vc.Device.Name, Volume = deviceModel.Volume });
 
                     return true;
                 });
@@ -76,7 +72,49 @@ namespace AVC.Wpf.Services
             return _outputDevices;
         }
 
-        public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
+        public void SelectDeviceById(Guid id)
+        {
+            // mark all local models as not selected
+            _outputDevices.ForEach(m => m.Selected = false);
+
+            // mark requested model as selected
+            _outputDevices.Single(m => m.Id == id).Selected = true;
+
+            // select the output device
+            IDevice device = _audioController.GetDevice(id);
+            device.SetAsDefault();
+        }
+
+        private void SetDeviceVolume(Guid id, int value)
+        {
+            _audioController.GetDevice(id).SetVolumeAsync(value);
+        }
+
+        private void OnArduinoDeviceUpdateEvent(ArduinoDeviceUpdateMessage message)
+        {
+            switch (message.Channel) {
+                case 0: // device (master) channel
+                    SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, message.Volume);
+                    break;
+                case 1: // audion session channel 1
+                    break;
+                case 2: // audio session channel 2
+                    break;
+            }
+        }
+
+        private void OnUIDeviceUpdateEvent(UIDeviceUpdateMessage message)
+        {
+            SetDeviceVolume(message.Id, message.Volume);
+        }
+
+        public void Dispose()
+        {
+            _logger.LogTrace("{Function}()", nameof(Dispose));
+        }
+
+        /*
+         public List<AudioSessionModel> GetAudioSessionsForCurrentDevice()
         {
             return GetAudioSessionsForDevice(_outputDevices.Single(m => m.Selected).Id);
         }
@@ -86,7 +124,7 @@ namespace AVC.Wpf.Services
             _audioSessions.Clear();
 
             IDevice audioDevice = _audioController.GetDevice(id);
-            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().All();
+            IEnumerable<IAudioSession> sessions = audioDevice.GetCapability<IAudioSessionController>().AllAsync().Result;
 
             foreach (IAudioSession session in sessions) {
                 AudioSessionModel sessionModel = new() {
@@ -112,23 +150,6 @@ namespace AVC.Wpf.Services
             return _audioSessions;
         }
 
-        public void SelectDeviceById(Guid id)
-        {
-            // mark all local models as not selected
-            _outputDevices.ForEach(m => m.Selected = false);
-
-            // mark requested model as selected
-            _outputDevices.Single(m => m.Id == id).Selected = true;
-
-            // select the output device
-            _audioController.GetDevice(id).SetAsDefault();
-        }
-
-        public int GetDeviceVolume(Guid id)
-        {
-            return _outputDevices.Single(m => m.Id == id).Volume;
-        }
-
         public int GetAudioSessionVolume(string id)
         {
             return _audioSessions.Single(m => m.Id == id).Volume;
@@ -141,31 +162,6 @@ namespace AVC.Wpf.Services
             session.SetVolumeAsync(value);
         }
 
-        private void SetDeviceVolume(Guid id, int value)
-        {
-            _doSendMessage = false;
-            _audioController.GetDevice(id).SetVolumeAsync(value);
-        }
-
-        private void OnArduinoDeviceVolumeUpdate(ArduinoServiceDeviceVolumeUpdate obj)
-        {
-            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnArduinoDeviceVolumeUpdate));
-
-            SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
-        }
-
-        private void OnMainWindowDeviceVolumeUpdate(MainWindowDeviceVolumeUpdate obj)
-        {
-            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(OnMainWindowDeviceVolumeUpdate));
-
-            SetDeviceVolume(_outputDevices.Single(m => m.Selected).Id, obj.Volume);
-        }
-
-        public void Dispose()
-        {
-            _logger.LogDebug("{Class}.{Function}()", nameof(AudioService), nameof(Dispose));
-            PubSub.Unsubscribe<AudioService, ArduinoServiceDeviceVolumeUpdate>(this);
-            PubSub.Unsubscribe<AudioService, MainWindowDeviceVolumeUpdate>(this);
-        }
+         */
     }
 }
