@@ -16,6 +16,7 @@
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto" />
@@ -27,11 +28,35 @@
                Foreground="Aquamarine"
                VerticalAlignment="Center"
                Text="Serial ports:" />
-    <ComboBox Grid.Row="0"
+    <!--<ComboBox Grid.Row="0"
                Grid.Column="1"
                Margin="10 10 0 0"
                VerticalAlignment="Center"
-               ItemsSource="{Binding SerialPorts}" />
+               ItemsSource="{Binding SerialPorts}"
+               Text="Select COM port" />-->
+    <Grid Grid.Row="0"
+          Grid.Column="1"
+          Margin="10 10 0 0">
+      <ComboBox x:Name="DevicesComboBox"
+                ItemsSource="{Binding SerialPorts}" />
+      <TextBlock Margin="6 3 15 0"
+                 IsHitTestVisible="False"
+                 Text="Select COM port...">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Visibility"
+                    Value="Hidden" />
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding ElementName=DevicesComboBox, Path=SelectedItem}"
+                           Value="{x:Null}">
+                <Setter Property="Visibility"
+                        Value="Visible" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </Grid>
     <TextBlock Grid.Row="1"
                Grid.Column="0"
                Margin="10 10 0 0"
@@ -66,14 +91,26 @@
                Grid.Column="0"
                Margin="10 5 0 0"
                Foreground="Aquamarine"
-               Text="Arduino last message:" />
+               Text="Arduino last message received:" />
     <TextBlock Grid.Row="4"
                Grid.Column="1"
                Margin="10 5 0 0"
                Foreground="Silver"
                FontFamily="Consolas"
                VerticalAlignment="Bottom"
-               Text="{Binding ArduinoStatus.LastMessage}" />
+               Text="{Binding ArduinoStatus.LastMessageReceived}" />
+    <TextBlock Grid.Row="5"
+               Grid.Column="0"
+               Margin="10 5 0 0"
+               Foreground="Aquamarine"
+               Text="Arduino last message sent:" />
+    <TextBlock Grid.Row="5"
+               Grid.Column="1"
+               Margin="10 5 0 0"
+               Foreground="Silver"
+               FontFamily="Consolas"
+               VerticalAlignment="Bottom"
+               Text="{Binding ArduinoStatus.LastMessageSent}" />
 
   </Grid>
 

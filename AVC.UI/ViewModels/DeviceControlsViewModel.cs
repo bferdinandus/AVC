@@ -60,7 +60,7 @@ namespace AVC.UI.ViewModels
             _audioService = audioService;
             _eventAggregator = eventAggregator;
 
-            Devices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
+            Devices = _audioService.GetActiveOutputDevices();
             SelectedDevice = Devices.Single(s => s.Selected);
             DeviceVolume = SelectedDevice.Volume;
 

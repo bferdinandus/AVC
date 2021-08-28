@@ -39,6 +39,8 @@ namespace AVC.Wpf
 
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(OnStartup));
 
+            Log.Information("Initializing services in OnStartup()");
+
             //in order to ensure the UI stays responsive, we need to
             //do the work on a different thread
             Task.Factory.StartNew(() => {

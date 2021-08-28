@@ -48,9 +48,14 @@
           <StackPanel Orientation="Horizontal">
             <!--<Image Source="{Binding DeviceIcon}" Height="30"></Image>-->
             <!--<TextBlock Text="Todo: ShowIcon "></TextBlock>-->
-            <TextBlock Text="{Binding FullName}"
+            <TextBlock Margin="0"
                        Background="Transparent"
-                       Foreground="Aquamarine" />
+                       Foreground="Aquamarine"
+                       Text="{Binding FullName}"/>
+            <TextBlock Margin="5 0"
+                       Background="Transparent"
+                       Foreground="ForestGreen"
+                       Text="{Binding Volume}"/>
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>

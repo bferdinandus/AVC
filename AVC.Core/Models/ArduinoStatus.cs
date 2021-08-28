@@ -4,14 +4,26 @@ namespace AVC.Core.Models
 {
     public class ArduinoStatus : BindableBase
     {
+        private string _serialPort;
         private bool _serialPortOpen;
-        private bool _arduinoReady;
-        private string _lastMessage;
         private string _lastErrorMessage;
+        private bool _arduinoReady;
+        private string _lastMessageReceived;
+        private string _lastMessageSent;
+
+        public string SerialPort {
+            get => _serialPort;
+            set => SetProperty(ref _serialPort, value);
+        }
 
         public bool SerialPortOpen {
             get => _serialPortOpen;
             set => SetProperty(ref _serialPortOpen, value);
+        }
+
+        public string LastErrorMessage {
+            get => _lastErrorMessage;
+            set => SetProperty(ref _lastErrorMessage, value);
         }
 
         public bool ArduinoReady {
@@ -19,14 +31,14 @@ namespace AVC.Core.Models
             set => SetProperty(ref _arduinoReady, value);
         }
 
-        public string LastMessage {
-            get => _lastMessage;
-            set => SetProperty(ref _lastMessage, value);
+        public string LastMessageReceived {
+            get => _lastMessageReceived;
+            set => SetProperty(ref _lastMessageReceived, value);
         }
 
-        public string LastErrorMessage {
-            get => _lastErrorMessage;
-            set => SetProperty(ref _lastErrorMessage, value);
+        public string LastMessageSent {
+            get => _lastMessageSent;
+            set => SetProperty(ref _lastMessageSent, value);
         }
     }
 }

@@ -19,7 +19,6 @@ namespace AVC.Core.Services
         private readonly SerialPort _serialPort = new();
         private readonly ArduinoStatus _arduinoStatus = new();
         private long _lastDeviceUpdateEventSent = DateTime.Now.Ticks;
-        private bool _arduinoReady;
 
         /*
          * constructor
@@ -33,33 +32,65 @@ namespace AVC.Core.Services
             _eventAggregator.GetEvent<ArduinoMessageEvent>().Subscribe(OnArduinoMessageEvent);
             _eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
 
-            ConnectArduino();
+            // set default port
+            _arduinoStatus.SerialPort = "COM4";
+
+            OpenSerialPort();
         }
 
         public ArduinoStatus Status() => _arduinoStatus;
 
         public string[] GetPorts() => SerialPort.GetPortNames();
 
-        private void ConnectArduino()
+        private void OpenSerialPort()
         {
             try {
-                _serialPort.PortName = "COM4";
+                _serialPort.PortName = _arduinoStatus.SerialPort;
+                _arduinoStatus.LastErrorMessage = string.Empty;
                 _serialPort.BaudRate = 115200;
                 _serialPort.DtrEnable = true;
 
                 _serialPort.DataReceived += DataReceivedHandler;
+                _serialPort.ErrorReceived += ErrorReceivedHandler;
+                _serialPort.PinChanged += PinChangedHandler;
 
                 _serialPort.Open();
                 _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
             } catch (Exception e) {
                 _logger.LogError(e, "Serial port not open");
-                _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
                 _arduinoStatus.LastErrorMessage = e.Message;
+                CloseSerialPort();
             }
+        }
+
+        private void CloseSerialPort()
+        {
+            _arduinoStatus.SerialPortOpen = false;
+            _arduinoStatus.ArduinoReady = false;
+            _serialPort.DataReceived -= DataReceivedHandler;
+            _serialPort.ErrorReceived -= ErrorReceivedHandler;
+            _serialPort.PinChanged -= PinChangedHandler;
+
+            _serialPort.Close();
+        }
+
+        private void PinChangedHandler(object sender, SerialPinChangedEventArgs e)
+        {
+            _logger.LogWarning("SerialPort PinChange: {err}", e.EventType);
+            // _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
+            // _arduinoStatus.ArduinoReady = false;
+        }
+
+        private void ErrorReceivedHandler(object sender, SerialErrorReceivedEventArgs e)
+        {
+            _logger.LogError("SerialPort error: {err}", e.EventType);
+            _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
+            _arduinoStatus.ArduinoReady = false;
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
+            _logger.LogDebug("DataReceivedHandler");
             bool receiveInProgress = false;
             const char startMarker = '<';
             const char endMarker = '>';
@@ -82,7 +113,7 @@ namespace AVC.Core.Services
 
         private void OnArduinoMessageEvent(string message)
         {
-            _arduinoStatus.LastMessage = message;
+            _arduinoStatus.LastMessageReceived = message;
 
             string[] messageParts = message.Split(':');
 
@@ -95,9 +126,8 @@ namespace AVC.Core.Services
             switch (arduinoCommand) {
                 case ArduinoCommands.Ready:
                     // 0:cmd 1:ready
-                    _arduinoReady = true;
                     _arduinoStatus.ArduinoReady = true;
-                    _serialPort.WriteLine("<0,Master,10>");
+                    SendMessageToArduino("<0,Master,10>");
                     break;
                 case ArduinoCommands.Vol:
                     // 0:cmd 1:vol 2:(index) 3:(volume)
@@ -115,10 +145,6 @@ namespace AVC.Core.Services
 
         private void OnDeviceUpdateEvent(DeviceUpdateMessage message)
         {
-            if (!_arduinoReady) {
-                return;
-            }
-
             if ((DateTime.Now.Ticks - _lastDeviceUpdateEventSent) / TimeSpan.TicksPerMillisecond < 50) {
                 // block incoming device updated x milliseconds after the last ArduinoDeviceUpdateEvent publish
                 _logger.LogDebug("Blocked {0}", nameof(DeviceUpdateEvent));
@@ -127,17 +153,33 @@ namespace AVC.Core.Services
             }
 
             // device is on channel 0 of the arduino
-            string arduinoInfo = $"<0,{message.DeviceName[..Math.Min(9, message.DeviceName.Length)].Trim()},{message.Volume}>";
-            _logger.LogDebug("message:{message}", arduinoInfo);
-            _serialPort.WriteLine(arduinoInfo);
+            SendMessageToArduino($"<0,{message.DeviceName[..Math.Min(9, message.DeviceName.Length)].Trim()},{message.Volume}>");
+        }
+
+        private void SendMessageToArduino(string message)
+        {
+            if (!_arduinoStatus.SerialPortOpen && !_arduinoStatus.ArduinoReady) {
+                OpenSerialPort();
+
+                return;
+            }
+
+            if (!_serialPort.IsOpen && _arduinoStatus.SerialPortOpen) {
+                CloseSerialPort();
+
+                return;
+            }
+
+            _logger.LogDebug("message:{message}", message);
+            _arduinoStatus.LastMessageSent = message;
+            _serialPort.WriteLine(message);
         }
 
         public void Dispose()
         {
             _logger.LogTrace("{Function}()", nameof(Dispose));
 
-            _serialPort.DataReceived -= DataReceivedHandler;
-            _serialPort.Close();
+            CloseSerialPort();
             _serialPort.Dispose();
         }
     }

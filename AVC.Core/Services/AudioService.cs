@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
@@ -20,7 +21,7 @@ namespace AVC.Core.Services
         private readonly ILogger<AudioService> _logger;
 
         //private variables
-        private readonly List<AudioDeviceModel> _outputDevices = new();
+        private readonly ObservableCollection<AudioDeviceModel> _outputDevices = new();
         private readonly List<AudioSessionModel> _audioSessions = new();
 
         /*
@@ -38,8 +39,10 @@ namespace AVC.Core.Services
             _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
         }
 
-        public List<AudioDeviceModel> GetActiveOutputDevices()
+        public ObservableCollection<AudioDeviceModel> GetActiveOutputDevices()
         {
+            _outputDevices.Clear();
+
             IEnumerable<IDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
 
             foreach (IDevice device in devices) {
@@ -75,7 +78,9 @@ namespace AVC.Core.Services
         public void SelectDeviceById(Guid id)
         {
             // mark all local models as not selected
-            _outputDevices.ForEach(m => m.Selected = false);
+            foreach (AudioDeviceModel audioDeviceModel in _outputDevices) {
+                audioDeviceModel.Selected = false;
+            }
 
             // mark requested model as selected
             _outputDevices.Single(m => m.Id == id).Selected = true;
