@@ -15,6 +15,8 @@
         d:DataContext="{d:DesignInstance viewModels:DeviceControlsViewModel}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
@@ -31,6 +33,7 @@
 
     <ListBox Grid.Column="0"
              Grid.Row="1"
+             Grid.RowSpan="3"
              x:Name="DevicesListBox"
              Margin="10 10 10 10"
              ItemsSource="{Binding Devices, Mode=OneWay}"
@@ -51,11 +54,11 @@
             <TextBlock Margin="0"
                        Background="Transparent"
                        Foreground="Aquamarine"
-                       Text="{Binding FullName}"/>
+                       Text="{Binding FullName}" />
             <TextBlock Margin="5 0"
                        Background="Transparent"
                        Foreground="ForestGreen"
-                       Text="{Binding Volume}"/>
+                       Text="{Binding Volume}" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
@@ -64,9 +67,8 @@
     <TextBlock Grid.Column="1"
                Grid.Row="0"
                Margin="10 10 10 0"
-               Foreground="Aquamarine">
-      Volume
-    </TextBlock>
+               Foreground="Aquamarine"
+               Text="Volume" />
 
     <Slider Grid.Row="1"
             Grid.Column="1"
@@ -86,5 +88,21 @@
       </i:Interaction.Triggers>
     </Slider>
 
+
+    <TextBlock Grid.Column="1"
+               Grid.Row="2"
+               Margin="10 10 10 0"
+               Foreground="Aquamarine"
+               Text="Change Device" />
+
+    <Button Grid.Column="1"
+            Grid.Row="3"
+            Margin="10 10 10 0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Command="{Binding NextDeviceCommand}">
+      <TextBlock Margin="6 3"
+                 Text="Next..." />
+    </Button>
   </Grid>
 </UserControl>

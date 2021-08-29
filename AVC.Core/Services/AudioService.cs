@@ -95,6 +95,19 @@ namespace AVC.Core.Services
             _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
+        public void NextDevice()
+        {
+            int index = _outputDevices.IndexOf(_outputDevices.Single(d => d.Selected));
+
+            index++;
+            if (index >= _outputDevices.Count) {
+                index = 0;
+            }
+
+            SelectDeviceById(_outputDevices[index].Id);
+        }
+
+        // events
         private void OnArduinoDeviceUpdateEvent(ArduinoDeviceUpdateMessage message)
         {
             switch (message.Channel) {

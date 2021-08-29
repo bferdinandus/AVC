@@ -38,7 +38,8 @@
           Grid.Column="1"
           Margin="10 10 0 0">
       <ComboBox x:Name="DevicesComboBox"
-                ItemsSource="{Binding SerialPorts}" />
+                ItemsSource="{Binding SerialPorts}"
+                SelectedValue="{Binding ArduinoStatus.SerialPort}"/>
       <TextBlock Margin="6 3 15 0"
                  IsHitTestVisible="False"
                  Text="Select COM port...">

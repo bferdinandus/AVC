@@ -8,5 +8,6 @@ namespace AVC.Core.Services
     {
         ObservableCollection<AudioDeviceModel> GetActiveOutputDevices();
         void SelectDeviceById(Guid id);
+        public void NextDevice();
     }
 }

@@ -48,6 +48,7 @@ namespace AVC.UI.ViewModels
         // commands
         public DelegateCommand<SelectionChangedEventArgs> DeviceSelectionChangedCommand { get; private set; }
         public DelegateCommand<RoutedPropertyChangedEventArgs<double>> VolumeChangedCommand { get; private set; }
+        public DelegateCommand NextDeviceCommand { get; private set; }
 
         /*
          * constructor
@@ -61,15 +62,16 @@ namespace AVC.UI.ViewModels
             _eventAggregator = eventAggregator;
 
             Devices = _audioService.GetActiveOutputDevices();
-            SelectedDevice = Devices.Single(s => s.Selected);
-            DeviceVolume = SelectedDevice.Volume;
+            UpdateSelectedDevice();
 
             DeviceSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnDeviceSelectionChangedCommand);
             VolumeChangedCommand = new DelegateCommand<RoutedPropertyChangedEventArgs<double>>(OnVolumeChangedCommand);
+            NextDeviceCommand = new DelegateCommand(OnNextDeviceCommand);
 
             eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
         }
 
+        // Commands
         private void OnVolumeChangedCommand(RoutedPropertyChangedEventArgs<double> obj)
         {
             if ((DateTime.Now.Ticks - _lastDeviceUpdateEventReceived) / TimeSpan.TicksPerMillisecond < 50) {
@@ -98,6 +100,13 @@ namespace AVC.UI.ViewModels
             _audioService.SelectDeviceById(device.Id);
         }
 
+        private void OnNextDeviceCommand()
+        {
+            _audioService.NextDevice();
+            UpdateSelectedDevice();
+        }
+
+        // Events
         private void OnDeviceUpdateEvent(DeviceUpdateMessage message)
         {
             if (DeviceVolume == message.Volume) {
@@ -108,6 +117,13 @@ namespace AVC.UI.ViewModels
 
             _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
             DeviceVolume = message.Volume;
+        }
+
+        // Private Functions
+        private void UpdateSelectedDevice()
+        {
+            SelectedDevice = Devices.Single(s => s.Selected);
+            DeviceVolume = SelectedDevice.Volume;
         }
 
         public void Dispose()
