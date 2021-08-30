@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using AVC.Core.Models;
 
 namespace AVC.Core.Services
 {
     public interface IAudioService
     {
-        ObservableCollection<AudioDeviceModel> GetActiveOutputDevices();
+        IEnumerable<AudioDeviceModel> GetActiveOutputDevices(bool refresh);
         void SelectDeviceById(Guid id);
         public void NextDevice();
     }

@@ -35,6 +35,13 @@ namespace AVC.Core.Services
             // set default port
             _arduinoStatus.SerialPort = "COM4";
 
+            _serialPort.BaudRate = 115200;
+            _serialPort.DtrEnable = true;
+
+            _serialPort.DataReceived += DataReceivedHandler;
+            _serialPort.ErrorReceived += ErrorReceivedHandler;
+            _serialPort.PinChanged += PinChangedHandler;
+
             OpenSerialPort();
         }
 
@@ -47,12 +54,6 @@ namespace AVC.Core.Services
             try {
                 _serialPort.PortName = _arduinoStatus.SerialPort;
                 _arduinoStatus.LastErrorMessage = string.Empty;
-                _serialPort.BaudRate = 115200;
-                _serialPort.DtrEnable = true;
-
-                _serialPort.DataReceived += DataReceivedHandler;
-                _serialPort.ErrorReceived += ErrorReceivedHandler;
-                _serialPort.PinChanged += PinChangedHandler;
 
                 _serialPort.Open();
                 _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
@@ -67,9 +68,6 @@ namespace AVC.Core.Services
         {
             _arduinoStatus.SerialPortOpen = false;
             _arduinoStatus.ArduinoReady = false;
-            _serialPort.DataReceived -= DataReceivedHandler;
-            _serialPort.ErrorReceived -= ErrorReceivedHandler;
-            _serialPort.PinChanged -= PinChangedHandler;
 
             _serialPort.Close();
         }
@@ -77,6 +75,7 @@ namespace AVC.Core.Services
         private void PinChangedHandler(object sender, SerialPinChangedEventArgs e)
         {
             _logger.LogWarning("SerialPort PinChange: {err}", e.EventType);
+
             // _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
             // _arduinoStatus.ArduinoReady = false;
         }
@@ -180,6 +179,9 @@ namespace AVC.Core.Services
             _logger.LogTrace("{Function}()", nameof(Dispose));
 
             CloseSerialPort();
+            _serialPort.DataReceived -= DataReceivedHandler;
+            _serialPort.ErrorReceived -= ErrorReceivedHandler;
+            _serialPort.PinChanged -= PinChangedHandler;
             _serialPort.Dispose();
         }
     }

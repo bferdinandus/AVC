@@ -25,7 +25,7 @@ namespace AVC.Wpf
         [UsedImplicitly]
         private IAudioService _audioService;
 
-        public App() {}
+        // public App() {}
 
         protected override void OnStartup(StartupEventArgs e)
         {
