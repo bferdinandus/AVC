@@ -8,6 +8,11 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 
+// https://github.com/Belphemur/SoundSwitch
+// https://github.com/naudio/NAudio
+// https://weblog.west-wind.com/posts/2017/jul/02/debouncing-and-throttling-dispatcher-events
+
+
 namespace AVC.Core.Services
 {
     [UsedImplicitly(ImplicitUseKindFlags.Access)]
@@ -31,7 +36,8 @@ namespace AVC.Core.Services
             _logger = logger;
             _eventAggregator = eventAggregator;
 
-            // _eventAggregator.GetEvent<UiDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
+            _eventAggregator.GetEvent<UiDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
+
             // _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
 
             //_deviceChangedSubscription = _audioController.AudioDeviceChanged.Subscribe(OnAudioDeviceChangedEvent);
@@ -50,7 +56,7 @@ namespace AVC.Core.Services
 
         public void SelectDeviceById(string id)
         {
-            /*if (_outputDevices.Single(d => d.Id == id).Selected) {
+            if (_outputDevices.Single(d => d.Id == id).Selected) {
                 // given Id already selected => gtfo
                 return;
             }
@@ -64,20 +70,20 @@ namespace AVC.Core.Services
             _outputDevices.Single(m => m.Id == id).Selected = true;
 
             // select the output device
-            IDevice device = _audioController.GetDevice(id);
-            device.SetAsDefault();*/
+            MMDeviceEnumerator enumerator = new();
+            enumerator.SetDefaultAudioEndpoint(enumerator.GetDevice(id));
         }
 
         public void NextDevice()
         {
-            /*int index = _outputDevices.IndexOf(_outputDevices.Single(d => d.Selected));
+            int index = _outputDevices.IndexOf(_outputDevices.Single(d => d.Selected));
 
             index++;
             if (index >= _outputDevices.Count) {
                 index = 0;
             }
 
-            SelectDeviceById(_outputDevices[index].Id);*/
+            SelectDeviceById(_outputDevices[index].Id);
         }
 
         /*
@@ -98,51 +104,14 @@ namespace AVC.Core.Services
         }
         */
 
-        /*private void OnUIDeviceUpdateEvent(UiDeviceUpdateMessage message)
+        private void OnUIDeviceUpdateEvent(UiDeviceUpdateMessage message)
         {
-            SetDeviceVolume(message.Id, message.Volume);
-        }*/
-
-        /*
-        private void OnAudioDeviceChangedEvent(DeviceChangedArgs args)
-        {
-            _logger.LogDebug("{0} - {1}  DeviceType:{t} State:{s} IsDefaultDevice:{f}",
-                             args.Device.Name,
-                             args.ChangedType,
-                             args.Device.DeviceType,
-                             args.Device.State,
-                             args.Device.IsDefaultDevice);
-
-            if (args.Device.DeviceType == DeviceType.Playback && args.ChangedType == DeviceChangedType.StateChanged) {
-                if (args.Device.State == DeviceState.Active) {
-                    AddDeviceModelToList(args.Device);
-                }
-
-                if (args.Device.State != DeviceState.Active) {
-                    RemoveDeviceModelFromList(args.Device.Id);
-                }
-
-                _eventAggregator.GetEvent<DeviceChangedEvent>().Publish();
+            MMDeviceEnumerator enumerator = new();
+            using AudioEndpointVolume audioEndpointVolume = enumerator.GetDevice(message.Id).AudioEndpointVolume;
+            if (audioEndpointVolume != null && (int) (audioEndpointVolume.MasterVolumeLevelScalar * 100) != message.Volume) {
+                audioEndpointVolume.MasterVolumeLevelScalar = message.Volume / 100F;
             }
         }
-        */
-
-        /*
-        private void OnVolumeChangedEvent(AudioVolumeNotificationData data)
-        {
-            // update the model and send eventMessage
-            AudioDeviceModel deviceModel = _outputDevices.Single(d => d.Id == args.Device.Id);
-
-            _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, (int) args.Device.Volume);
-            if (deviceModel.Volume == (int) args.Device.Volume) {
-                return;
-            }
-
-            deviceModel.Volume = (int) args.Device.Volume;
-
-            _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = args.Device.Name, Volume = deviceModel.Volume });
-        }
-        */
 
         /*
          * Private functions
@@ -153,13 +122,19 @@ namespace AVC.Core.Services
                 RemoveDeviceModelFromList(_outputDevices.Last().Id);
             }
 
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
+            MMDeviceEnumerator enumerator = new();
 
             foreach (MMDevice device in enumerator.EnumerateAudioEndPoints(EDataFlow.eRender, DEVICE_STATE.DEVICE_STATE_ACTIVE)) {
-                AudioDeviceModel deviceModel = new AudioDeviceModel(device);
+                AudioDeviceModel deviceModel = new(device);
                 deviceModel.PropertyChanged += (sender, args) => {
-                    _logger.LogInformation("PropChange {0}", args.PropertyName);
-                    _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = (sender as AudioDeviceModel)?.FullName, Volume = deviceModel.Volume });
+                    // sender gets cast to the type AudioDeviceModel and put in the variable audioDeviceModel
+                    if (sender is not AudioDeviceModel audioDeviceModel || args.PropertyName != nameof(AudioDeviceModel.Volume)) {
+                        return;
+                    }
+
+                    _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, deviceModel.Volume);
+                    _eventAggregator.GetEvent<DeviceUpdateEvent>()
+                                    .Publish(new DeviceUpdateMessage { DeviceName = audioDeviceModel.FullName, Volume = deviceModel.Volume });
                 };
 
                 _outputDevices.Add(deviceModel);

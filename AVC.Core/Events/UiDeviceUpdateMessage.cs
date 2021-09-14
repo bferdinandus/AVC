@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AVC.Core.Events
+﻿namespace AVC.Core.Events
 {
     public class UiDeviceUpdateMessage
     {

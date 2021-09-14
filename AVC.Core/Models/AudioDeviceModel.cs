@@ -61,8 +61,8 @@ namespace AVC.Core.Models
             Volume = (int) (_deviceAudioEndpointVolume.MasterVolumeLevelScalar * 100);
             Muted = _deviceAudioEndpointVolume.Mute;
 
-            if (device.Properties != null && device.Properties.Contains(PKEY.PKEY_Device_FriendlyName)) {
-                FullName = (string) device.Properties[PKEY.PKEY_Device_FriendlyName]?.Value;
+            if (device.Properties != null && device.Properties.Contains(PKEY.PKEY_Device_DeviceDesc)) {
+                FullName = (string) device.Properties[PKEY.PKEY_Device_DeviceDesc]?.Value;
             } else {
                 FullName = device.FriendlyName;
             }

@@ -189,6 +189,7 @@ namespace AVC.Core.Services
             _logger.LogTrace("{Function}()", nameof(Dispose));
 
             CloseSerialPort();
+
             // _serialPort.DataReceived -= DataReceivedHandler;
             // _serialPort.ErrorReceived -= ErrorReceivedHandler;
             // _serialPort.PinChanged -= PinChangedHandler;
