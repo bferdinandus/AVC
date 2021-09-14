@@ -26,14 +26,10 @@ namespace AVC.UI.ViewModels
         private long _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
 
         // UI properties
-        private readonly ObservableCollection<AudioDeviceModel> _devices;
         private AudioDeviceModel _selectedDevice;
         private int _deviceVolume;
 
-        public ObservableCollection<AudioDeviceModel> Devices {
-            get => _devices;
-            private init => SetProperty(ref _devices, value);
-        }
+        public ObservableCollection<AudioDeviceModel> Devices { get; } = new();
 
         public AudioDeviceModel SelectedDevice {
             get => _selectedDevice;
@@ -45,12 +41,16 @@ namespace AVC.UI.ViewModels
             set => SetProperty(ref _deviceVolume, value);
         }
 
-        // commands
-        public DelegateCommand<SelectionChangedEventArgs> DeviceSelectionChangedCommand { get; private set; }
-        public DelegateCommand<RoutedPropertyChangedEventArgs<double>> VolumeChangedCommand { get; private set; }
+        /*
+         * Commands
+         */
+        public DelegateCommand<SelectionChangedEventArgs> DeviceSelectionChangedCommand { get; }
+        public DelegateCommand<RoutedPropertyChangedEventArgs<double>> VolumeChangedCommand { get; }
+        public DelegateCommand NextDeviceCommand { get; }
+        public DelegateCommand RefreshDevicesCommand { get; }
 
         /*
-         * constructor
+         * Constructor
          */
         public DeviceControlsViewModel(IAudioService audioService,
                                        IEventAggregator eventAggregator,
@@ -60,44 +60,60 @@ namespace AVC.UI.ViewModels
             _audioService = audioService;
             _eventAggregator = eventAggregator;
 
-            Devices = new ObservableCollection<AudioDeviceModel>(_audioService.GetActiveOutputDevices());
-            SelectedDevice = Devices.Single(s => s.Selected);
-            DeviceVolume = SelectedDevice.Volume;
+            UpdateDevices();
+            UpdateSelectedDevice();
 
             DeviceSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnDeviceSelectionChangedCommand);
             VolumeChangedCommand = new DelegateCommand<RoutedPropertyChangedEventArgs<double>>(OnVolumeChangedCommand);
+            NextDeviceCommand = new DelegateCommand(OnNextDeviceCommand);
+            RefreshDevicesCommand = new DelegateCommand(OnRefreshDevicesCommand);
 
             eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
+            eventAggregator.GetEvent<DeviceChangedEvent>().Subscribe(OnDeviceChangedEvent, ThreadOption.UIThread);
         }
 
+        /*
+         * Commands functions
+         */
         private void OnVolumeChangedCommand(RoutedPropertyChangedEventArgs<double> obj)
         {
             if ((DateTime.Now.Ticks - _lastDeviceUpdateEventReceived) / TimeSpan.TicksPerMillisecond < 50) {
                 // block outgoing event x milliseconds after the last received DeviceUpdateEvent publish
-                _logger.LogDebug("Blocked {0}", nameof(UIDeviceUpdateEvent));
+                _logger.LogDebug("Blocked {0}", nameof(UiDeviceUpdateEvent));
 
                 return;
             }
 
             _logger.LogDebug("new volume from slider {0}", obj.NewValue);
 
-            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Publish(new UIDeviceUpdateMessage { Id = SelectedDevice.Id, Volume = (int) obj.NewValue });
+            _eventAggregator.GetEvent<UiDeviceUpdateEvent>().Publish(new UiDeviceUpdateMessage { Id = SelectedDevice.Id, Volume = (int) obj.NewValue });
         }
 
-        private void OnDeviceSelectionChangedCommand(SelectionChangedEventArgs obj)
+        private void OnDeviceSelectionChangedCommand(SelectionChangedEventArgs args)
         {
-            if (obj.AddedItems.Count == 0) {
+            if (args.AddedItems.Count == 0 || args.AddedItems[0] is not AudioDeviceModel addedDeviceModel) {
                 return;
             }
 
-            if (obj.AddedItems[0] is not AudioDeviceModel device) {
-                return;
-            }
-
-            DeviceVolume = device.Volume;
-            _audioService.SelectDeviceById(device.Id);
+            DeviceVolume = addedDeviceModel.Volume;
+            _audioService.SelectDeviceById(addedDeviceModel.Id);
         }
 
+        private void OnNextDeviceCommand()
+        {
+            _audioService.NextDevice();
+            UpdateSelectedDevice();
+        }
+
+        private void OnRefreshDevicesCommand()
+        {
+            UpdateDevices(true);
+            UpdateSelectedDevice();
+        }
+
+        /*
+         * Events functions
+         */
         private void OnDeviceUpdateEvent(DeviceUpdateMessage message)
         {
             if (DeviceVolume == message.Volume) {
@@ -108,6 +124,29 @@ namespace AVC.UI.ViewModels
 
             _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
             DeviceVolume = message.Volume;
+        }
+
+        private void OnDeviceChangedEvent()
+        {
+            UpdateDevices();
+            UpdateSelectedDevice();
+        }
+
+        /*
+         * Private functions
+         */
+        private void UpdateDevices(bool forceRefresh = false)
+        {
+            Devices.Clear();
+            foreach (AudioDeviceModel deviceModel in _audioService.GetActiveOutputDevices(forceRefresh)) {
+                Devices.Add(deviceModel);
+            }
+        }
+
+        private void UpdateSelectedDevice()
+        {
+            SelectedDevice = Devices.Single(s => s.Selected);
+            DeviceVolume = SelectedDevice.Volume;
         }
 
         public void Dispose()

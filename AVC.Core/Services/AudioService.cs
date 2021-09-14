@@ -20,8 +20,9 @@ namespace AVC.Core.Services
         private readonly ILogger<AudioService> _logger;
 
         //private variables
-        private readonly List<AudioDeviceModel> _outputDevices = new();
-        private readonly List<AudioSessionModel> _audioSessions = new();
+        private readonly IList<AudioDeviceModel> _outputDevices = new List<AudioDeviceModel>();
+        private readonly IList<AudioSessionModel> _audioSessions = new List<AudioSessionModel>();
+        private readonly IDisposable _deviceChangedSubscription;
 
         /*
          * constructor
@@ -34,39 +35,18 @@ namespace AVC.Core.Services
             _audioController = audioController;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<UIDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
+            _eventAggregator.GetEvent<UiDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
             _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
+
+            _deviceChangedSubscription = _audioController.AudioDeviceChanged.Subscribe(OnAudioDeviceChangedEvent);
+
+            RefreshActiveOutputDevices();
         }
 
-        public List<AudioDeviceModel> GetActiveOutputDevices()
+        public IEnumerable<AudioDeviceModel> GetActiveOutputDevices(bool refresh)
         {
-            IEnumerable<IDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
-
-            foreach (IDevice device in devices) {
-                AudioDeviceModel deviceModel = new() {
-                    Id = device.Id,
-                    FullName = device.Name,
-                    Selected = device.IsDefaultDevice,
-                    Volume = (int) device.Volume,
-                    Muted = device.IsMuted,
-                    IconPath = device.IconPath
-                };
-
-                // update the model and send eventMessage
-                device.VolumeChanged.When(vc => {
-                    if (deviceModel.Volume == (int) vc.Device.Volume) {
-                        return false;
-                    }
-
-                    _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, (int) vc.Device.Volume);
-
-                    deviceModel.Volume = (int) vc.Device.Volume;
-                    _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = vc.Device.Name, Volume = deviceModel.Volume });
-
-                    return true;
-                });
-
-                _outputDevices.Add(deviceModel);
+            if (refresh) {
+                RefreshActiveOutputDevices();
             }
 
             return _outputDevices;
@@ -74,8 +54,15 @@ namespace AVC.Core.Services
 
         public void SelectDeviceById(Guid id)
         {
+            if (_outputDevices.Single(d => d.Id == id).Selected) {
+                // given Id already selected => gtfo
+                return;
+            }
+
             // mark all local models as not selected
-            _outputDevices.ForEach(m => m.Selected = false);
+            foreach (AudioDeviceModel audioDeviceModel in _outputDevices) {
+                audioDeviceModel.Selected = false;
+            }
 
             // mark requested model as selected
             _outputDevices.Single(m => m.Id == id).Selected = true;
@@ -85,11 +72,21 @@ namespace AVC.Core.Services
             device.SetAsDefault();
         }
 
-        private void SetDeviceVolume(Guid id, int value)
+        public void NextDevice()
         {
-            _audioController.GetDevice(id).SetVolumeAsync(value);
+            int index = _outputDevices.IndexOf(_outputDevices.Single(d => d.Selected));
+
+            index++;
+            if (index >= _outputDevices.Count) {
+                index = 0;
+            }
+
+            SelectDeviceById(_outputDevices[index].Id);
         }
 
+        /*
+         * Events functions
+         */
         private void OnArduinoDeviceUpdateEvent(ArduinoDeviceUpdateMessage message)
         {
             switch (message.Channel) {
@@ -103,14 +100,90 @@ namespace AVC.Core.Services
             }
         }
 
-        private void OnUIDeviceUpdateEvent(UIDeviceUpdateMessage message)
+        private void OnUIDeviceUpdateEvent(UiDeviceUpdateMessage message)
         {
             SetDeviceVolume(message.Id, message.Volume);
         }
 
-        public void Dispose()
+        private void OnAudioDeviceChangedEvent(DeviceChangedArgs args)
         {
-            _logger.LogTrace("{Function}()", nameof(Dispose));
+            _logger.LogDebug("{0} - {1}  DeviceType:{t} State:{s} IsDefaultDevice:{f}",
+                             args.Device.Name,
+                             args.ChangedType,
+                             args.Device.DeviceType,
+                             args.Device.State,
+                             args.Device.IsDefaultDevice);
+
+            if (args.Device.DeviceType == DeviceType.Playback && args.ChangedType == DeviceChangedType.StateChanged) {
+                if (args.Device.State == DeviceState.Active) {
+                    AddDeviceModelToList(args.Device);
+                }
+
+                if (args.Device.State != DeviceState.Active) {
+                    RemoveDeviceModelFromList(args.Device.Id);
+                }
+
+                _eventAggregator.GetEvent<DeviceChangedEvent>().Publish();
+            }
+        }
+
+        private void OnVolumeChangedEvent(DeviceVolumeChangedArgs args)
+        {
+            // update the model and send eventMessage
+            AudioDeviceModel deviceModel = _outputDevices.Single(d => d.Id == args.Device.Id);
+
+            _logger.LogDebug("device volume: {deviceVolume} new volume: {volume}", deviceModel.Volume, (int) args.Device.Volume);
+            if (deviceModel.Volume == (int) args.Device.Volume) {
+                return;
+            }
+
+            deviceModel.Volume = (int) args.Device.Volume;
+
+            _eventAggregator.GetEvent<DeviceUpdateEvent>().Publish(new DeviceUpdateMessage { DeviceName = args.Device.Name, Volume = deviceModel.Volume });
+        }
+
+        /*
+         * Private functions
+         */
+        private void RefreshActiveOutputDevices()
+        {
+            while (_outputDevices.Count > 0) {
+                RemoveDeviceModelFromList(_outputDevices.Last().Id);
+            }
+
+            IEnumerable<IDevice> devices = _audioController.GetDevices(DeviceType.Playback, DeviceState.Active);
+
+            foreach (IDevice device in devices) {
+                AddDeviceModelToList(device);
+            }
+        }
+
+        private void AddDeviceModelToList(IDevice device)
+        {
+            AudioDeviceModel deviceModel = new() {
+                Id = device.Id,
+                FullName = device.Name,
+                Selected = device.IsDefaultDevice,
+                Volume = (int) device.Volume,
+                Muted = device.IsMuted,
+                IconPath = device.IconPath,
+                VolumeChangedSubscription = device.VolumeChanged.Subscribe(OnVolumeChangedEvent)
+            };
+
+            _outputDevices.Add(deviceModel);
+        }
+
+        private void RemoveDeviceModelFromList(Guid id)
+        {
+            AudioDeviceModel deviceModel = _outputDevices.Single(d => d.Id == id);
+            deviceModel.Dispose();
+
+            _outputDevices.Remove(deviceModel);
+        }
+
+        private void SetDeviceVolume(Guid id, int value)
+        {
+            _audioController.GetDevice(id).SetVolumeAsync(value);
         }
 
         /*
@@ -163,5 +236,34 @@ namespace AVC.Core.Services
         }
 
          */
+
+        private void ReleaseUnmanagedResources()
+        {
+            // release unmanaged resources here
+            while (_outputDevices.Count > 0) {
+                // RemoveDeviceModelFromList Disposes of the subscription.(and clears the list.
+                RemoveDeviceModelFromList(_outputDevices.Last().Id);
+            }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            ReleaseUnmanagedResources();
+            if (disposing) {
+                _audioController?.Dispose();
+                _deviceChangedSubscription?.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~AudioService()
+        {
+            Dispose(false);
+        }
     }
 }

@@ -31,7 +31,6 @@
 
     <ListBox Grid.Column="0"
              Grid.Row="1"
-             x:Name="DevicesListBox"
              Margin="10 10 10 10"
              ItemsSource="{Binding Devices, Mode=OneWay}"
              SelectedItem="{Binding SelectedDevice}"
@@ -48,38 +47,57 @@
           <StackPanel Orientation="Horizontal">
             <!--<Image Source="{Binding DeviceIcon}" Height="30"></Image>-->
             <!--<TextBlock Text="Todo: ShowIcon "></TextBlock>-->
-            <TextBlock Text="{Binding FullName}"
+            <TextBlock Margin="0"
                        Background="Transparent"
-                       Foreground="Aquamarine" />
+                       Foreground="Aquamarine"
+                       Text="{Binding FullName}" />
+            <TextBlock Margin="5 0"
+                       Background="Transparent"
+                       Foreground="ForestGreen"
+                       Text="{Binding Volume}" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
 
-    <TextBlock Grid.Column="1"
-               Grid.Row="0"
-               Margin="10 10 10 0"
-               Foreground="Aquamarine">
-      Volume
-    </TextBlock>
 
-    <Slider Grid.Row="1"
-            Grid.Column="1"
-            x:Name="Volume"
-            Margin="10 10 10 0"
-            VerticalAlignment="Top"
-            Minimum="0"
-            Maximum="100"
-            TickPlacement="Both"
-            TickFrequency="10"
-            LargeChange="10"
-            Value="{Binding DeviceVolume}">
-      <i:Interaction.Triggers>
-        <i:EventTrigger EventName="ValueChanged">
-          <prism:InvokeCommandAction Command="{Binding VolumeChangedCommand}" />
-        </i:EventTrigger>
-      </i:Interaction.Triggers>
-    </Slider>
+    <StackPanel Grid.Row="0"
+                Grid.Column="1"
+                Grid.RowSpan="2">
+      <TextBlock Margin="10 10 10 0"
+                 Foreground="Aquamarine"
+                 Text="Volume" />
+      <Slider Margin="10 10 10 0"
+              VerticalAlignment="Top"
+              Minimum="0"
+              Maximum="100"
+              TickPlacement="Both"
+              TickFrequency="10"
+              LargeChange="10"
+              Value="{Binding DeviceVolume}">
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="ValueChanged">
+            <prism:InvokeCommandAction Command="{Binding VolumeChangedCommand}" />
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+      </Slider>
 
+
+      <TextBlock Margin="10 10 10 0"
+                 Foreground="Aquamarine"
+                 Text="Device controls:" />
+
+      <Button Margin="10 10 10 0"
+              Command="{Binding NextDeviceCommand}">
+        <TextBlock Margin="6 3"
+                   Text="Next device" />
+      </Button>
+
+      <Button Margin="10 10 10 0"
+              Command="{Binding RefreshDevicesCommand}">
+        <TextBlock Margin="6 3"
+                   Text="Refresh devices" />
+      </Button>
+    </StackPanel>
   </Grid>
 </UserControl>

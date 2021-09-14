@@ -4,10 +4,12 @@ using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
 using AVC.Core.Services;
 using AVC.UI;
+using AVC.Wpf;
 using AVC.Wpf.Views;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Prism.DryIoc;
+using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Serilog;
@@ -25,7 +27,9 @@ namespace AVC.Wpf
         [UsedImplicitly]
         private IAudioService _audioService;
 
-        public App() {}
+        private IEventAggregator _eventAggregator;
+
+        // public App() {}
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -38,6 +42,10 @@ namespace AVC.Wpf
             base.OnStartup(e);
 
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(OnStartup));
+
+            Log.Information("Initializing services in OnStartup()");
+
+            _eventAggregator = Container.Resolve<IEventAggregator>();
 
             //in order to ensure the UI stays responsive, we need to
             //do the work on a different thread

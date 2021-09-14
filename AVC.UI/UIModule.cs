@@ -31,6 +31,7 @@ namespace AVC.UI
             _logger.LogTrace("{Function}()", nameof(OnInitialized));
 
             _regionManager.RegisterViewWithRegion(RegionNames.DeviceControls, typeof(DeviceControls));
+            _regionManager.RegisterViewWithRegion(RegionNames.ArduinoStatus, typeof(ArduinoStatus));
         }
     }
 }
