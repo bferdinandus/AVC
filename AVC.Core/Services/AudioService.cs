@@ -38,7 +38,7 @@ namespace AVC.Core.Services
             _eventAggregator.GetEvent<UiDeviceUpdateEvent>().Subscribe(OnUIDeviceUpdateEvent);
             _eventAggregator.GetEvent<ArduinoDeviceUpdateEvent>().Subscribe(OnArduinoDeviceUpdateEvent);
 
-            //_deviceChangedSubscription = _audioController.AudioDeviceChanged.Subscribe(OnAudioDeviceChangedEvent);
+            _deviceChangedSubscription = _audioController.AudioDeviceChanged.Subscribe(OnAudioDeviceChangedEvent);
 
             RefreshActiveOutputDevices();
         }
@@ -107,8 +107,12 @@ namespace AVC.Core.Services
 
         private void OnAudioDeviceChangedEvent(DeviceChangedArgs args)
         {
-            _logger.LogDebug("{0} - {1}", args.Device.Name, args.ChangedType.ToString());
-            _logger.LogDebug("State {s}", args.Device.State);
+            _logger.LogDebug("{0} - {1}  DeviceType:{t} State:{s} IsDefaultDevice:{f}",
+                             args.Device.Name,
+                             args.ChangedType,
+                             args.Device.DeviceType,
+                             args.Device.State,
+                             args.Device.IsDefaultDevice);
 
             if (args.Device.DeviceType == DeviceType.Playback && args.ChangedType == DeviceChangedType.StateChanged) {
                 if (args.Device.State == DeviceState.Active) {

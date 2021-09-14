@@ -69,8 +69,7 @@ namespace AVC.UI.ViewModels
             RefreshDevicesCommand = new DelegateCommand(OnRefreshDevicesCommand);
 
             eventAggregator.GetEvent<DeviceUpdateEvent>().Subscribe(OnDeviceUpdateEvent);
-
-            //eventAggregator.GetEvent<DeviceChangedEvent>().Subscribe(OnDeviceChangedEvent);
+            eventAggregator.GetEvent<DeviceChangedEvent>().Subscribe(OnDeviceChangedEvent, ThreadOption.UIThread);
         }
 
         /*
@@ -125,6 +124,12 @@ namespace AVC.UI.ViewModels
 
             _lastDeviceUpdateEventReceived = DateTime.Now.Ticks;
             DeviceVolume = message.Volume;
+        }
+
+        private void OnDeviceChangedEvent()
+        {
+            UpdateDevices();
+            UpdateSelectedDevice();
         }
 
         /*
