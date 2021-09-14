@@ -19,6 +19,7 @@ namespace AVC.Core.Services
         private readonly SerialPort _serialPort = new();
         private readonly ArduinoStatus _arduinoStatus = new();
         private long _lastDeviceUpdateEventSent = DateTime.Now.Ticks;
+        private int _serialErrorCount;
 
         /*
          * constructor
@@ -51,6 +52,10 @@ namespace AVC.Core.Services
 
         private void OpenSerialPort()
         {
+            if (_serialErrorCount > 3) {
+                return;
+            }
+
             try {
                 _serialPort.PortName = _arduinoStatus.SerialPort;
                 _arduinoStatus.LastErrorMessage = string.Empty;
@@ -58,6 +63,7 @@ namespace AVC.Core.Services
                 _serialPort.Open();
                 _arduinoStatus.SerialPortOpen = _serialPort.IsOpen;
             } catch (Exception e) {
+                _serialErrorCount++;
                 _logger.LogError(e, "Serial port not open");
                 _arduinoStatus.LastErrorMessage = e.Message;
                 CloseSerialPort();
@@ -174,15 +180,30 @@ namespace AVC.Core.Services
             _serialPort.WriteLine(message);
         }
 
-        public void Dispose()
+        private void Dispose(bool disposing)
         {
+            if (!disposing) {
+                return;
+            }
+
             _logger.LogTrace("{Function}()", nameof(Dispose));
 
             CloseSerialPort();
-            _serialPort.DataReceived -= DataReceivedHandler;
-            _serialPort.ErrorReceived -= ErrorReceivedHandler;
-            _serialPort.PinChanged -= PinChangedHandler;
+            // _serialPort.DataReceived -= DataReceivedHandler;
+            // _serialPort.ErrorReceived -= ErrorReceivedHandler;
+            // _serialPort.PinChanged -= PinChangedHandler;
             _serialPort.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ArduinoService()
+        {
+            Dispose(false);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace AVC.Core.Services
     public interface IAudioService
     {
         IEnumerable<AudioDeviceModel> GetActiveOutputDevices(bool refresh);
-        void SelectDeviceById(Guid id);
+        void SelectDeviceById(string id);
         public void NextDevice();
     }
 }

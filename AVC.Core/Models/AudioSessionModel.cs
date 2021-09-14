@@ -1,11 +1,10 @@
-﻿using AudioSwitcher.AudioApi.Session;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 
 namespace AVC.Core.Models
 {
     public class AudioSessionModel : BindableBase
     {
-        private string _displayName;
+        /*private string _displayName;
         private string _id;
         private string _iconPath;
         private int _processId;
@@ -58,6 +57,6 @@ namespace AVC.Core.Models
         public bool Selected {
             get => _selected;
             set => SetProperty(ref _selected, value);
-        }
+        }*/
     }
 }

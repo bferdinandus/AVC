@@ -1,19 +1,21 @@
 ﻿using System;
+using CoreAudio;
 using Prism.Mvvm;
 
 namespace AVC.Core.Models
 {
     public class AudioDeviceModel : BindableBase, IDisposable
     {
-        private Guid _id;
+        private string _id;
         private string _fullName;
         private bool _muted;
         private string _iconPath;
-        private IDisposable _volumeChangedSubscription;
         private int _volume;
         private bool _selected;
 
-        public Guid Id {
+        private readonly AudioEndpointVolume _deviceAudioEndpointVolume;
+
+        public string Id {
             get => _id;
             init => SetProperty(ref _id, value);
         }
@@ -43,13 +45,55 @@ namespace AVC.Core.Models
             init => SetProperty(ref _iconPath, value);
         }
 
-        public IDisposable VolumeChangedSubscription {
-            init => _volumeChangedSubscription = value;
+        public AudioDeviceModel(MMDevice device)
+        {
+            _deviceAudioEndpointVolume = device.AudioEndpointVolume;
+
+            Id = device.ID;
+            FullName = device.FriendlyName;
+            Selected = false;
+            IconPath = device.IconPath;
+
+            if (_deviceAudioEndpointVolume == null) {
+                return;
+            }
+
+            Volume = (int) (_deviceAudioEndpointVolume.MasterVolumeLevelScalar * 100);
+            Muted = _deviceAudioEndpointVolume.Mute;
+
+            if (device.Properties != null && device.Properties.Contains(PKEY.PKEY_Device_FriendlyName)) {
+                FullName = (string) device.Properties[PKEY.PKEY_Device_FriendlyName]?.Value;
+            } else {
+                FullName = device.FriendlyName;
+            }
+
+            _deviceAudioEndpointVolume.OnVolumeNotification += OnVolumeChangedEvent;
+        }
+
+        private void OnVolumeChangedEvent(AudioVolumeNotificationData data)
+        {
+            // update the model
+            if (Volume != (int) (data.MasterVolume * 100)) {
+                Volume = (int) (data.MasterVolume * 100);
+            }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing) {
+                _deviceAudioEndpointVolume?.Dispose();
+            }
         }
 
         public void Dispose()
         {
-            _volumeChangedSubscription?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~AudioDeviceModel()
+        {
+            Dispose(false);
         }
     }
 }

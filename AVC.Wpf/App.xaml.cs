@@ -1,10 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
-using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.CoreAudio;
 using AVC.Core.Services;
 using AVC.UI;
-using AVC.Wpf;
 using AVC.Wpf.Views;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,7 +94,6 @@ namespace AVC.Wpf
         {
             Log.Verbose("{Class}.{Function}()", nameof(App), nameof(RegisterTypes));
 
-            containerRegistry.RegisterSingleton<IAudioController, CoreAudioController>();
             containerRegistry.RegisterSingleton<IAudioService, AudioService>();
             containerRegistry.RegisterSingleton<IArduinoService, ArduinoService>();
         }

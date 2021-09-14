@@ -6,15 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CoreAudio" Version="1.10.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
       <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
       <PackageReference Include="Prism.Core" Version="8.1.97" />
       <PackageReference Include="System.IO.Ports" Version="5.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\AudioSwitcher\AudioSwitcher.AudioApi\AudioSwitcher.AudioApi.csproj" />
     </ItemGroup>
 
 </Project>
